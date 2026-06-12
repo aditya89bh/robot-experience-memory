@@ -44,6 +44,12 @@ from robot_experience_memory.ros2.rosbag import (
     rosbag_sensor_reference,
     rosbag_uri,
 )
+from robot_experience_memory.ros2.services import (
+    handle_recovery_request,
+    handle_retrieval_request,
+    recovery_service_payload,
+    retrieval_result_to_payload,
+)
 
 __all__ = [
     "LifecycleNodeAdapter",
@@ -54,6 +60,8 @@ __all__ = [
     "capture_action_execution",
     "ROS2ActionCapture",
     "ROS2IntegrationError",
+    "handle_recovery_request",
+    "handle_retrieval_request",
     "RosbagReference",
     "import_rclpy",
     "is_rclpy_available",
@@ -66,6 +74,8 @@ __all__ = [
     "recovery_suggestion_to_payload",
     "lifecycle_state_from_node",
     "replay_event_to_payload",
+    "recovery_service_payload",
+    "retrieval_result_to_payload",
     "rosbag_sensor_reference",
     "rosbag_uri",
     "require_lifecycle_support",
