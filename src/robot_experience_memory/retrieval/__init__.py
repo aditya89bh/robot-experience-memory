@@ -3,6 +3,10 @@
 from robot_experience_memory.retrieval.cache import RetrievalCache
 from robot_experience_memory.retrieval.engine import RetrievalEngine
 from robot_experience_memory.retrieval.errors import RetrievalError
+from robot_experience_memory.retrieval.evaluation import (
+    RetrievalEvaluationMetrics,
+    evaluate_retrieval_result,
+)
 from robot_experience_memory.retrieval.explanations import (
     RetrievalExplanation,
     explain_match,
@@ -33,6 +37,7 @@ from robot_experience_memory.retrieval.scoring import (
 __all__ = [
     "RetrievalCache",
     "RetrievalEngine",
+    "RetrievalEvaluationMetrics",
     "RetrievalError",
     "RetrievalExplanation",
     "RetrievalInterface",
@@ -49,5 +54,6 @@ __all__ = [
     "temporal_recency_scores",
     "score_bundles",
     "weighted_similarity_score",
+    "evaluate_retrieval_result",
     "explain_match",
 ]
