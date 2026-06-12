@@ -22,6 +22,14 @@ class MemoryStore(ABC):
     def get(self, experience_id: str) -> ExperienceBundle | None:
         """Return one complete experience bundle by ID, or ``None`` if missing."""
 
+    def put_many(self, bundles: list[ExperienceBundle]) -> list[ExperienceBundle]:
+        """Persist multiple complete experience bundles in input order."""
+        return [self.put(bundle) for bundle in bundles]
+
+    def get_many(self, experience_ids: list[str]) -> list[ExperienceBundle | None]:
+        """Retrieve multiple experience bundles in input ID order."""
+        return [self.get(experience_id) for experience_id in experience_ids]
+
     @abstractmethod
     def list(
         self,
