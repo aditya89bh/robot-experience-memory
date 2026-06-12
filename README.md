@@ -82,3 +82,16 @@ bundle = recorder.record(
 
 See `docs/recorder.md` for manual, context manager, decorator, exception, hook,
 and sensor-reference capture patterns.
+
+## Replay Example
+
+```python
+from robot_experience_memory.replay import ReplayConfig, ReplayEngine
+
+report = ReplayEngine(store, ReplayConfig(speed_multiplier=0.0)).replay()
+print(report.total_experiences)
+```
+
+Replay is structured and inspectable; it does not control a physical robot. See
+`docs/replay.md` for filtering, deterministic mode, callbacks, interruption, and
+CLI usage.
