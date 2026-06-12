@@ -1,7 +1,9 @@
 """High-level experience recording API."""
 
+from __future__ import annotations
+
 from collections.abc import Mapping
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from robot_experience_memory.identifiers import generate_experience_id
 from robot_experience_memory.models import (
@@ -23,6 +25,9 @@ from robot_experience_memory.timestamps import utc_now
 
 ModelInput = Mapping[str, Any]
 SensorReferenceInput = SensorReference | Mapping[str, Any]
+
+if TYPE_CHECKING:
+    from robot_experience_memory.recorder.context import RecordingContext
 
 
 class ExperienceRecorder:
@@ -98,6 +103,27 @@ class ExperienceRecorder:
         stored = self.store.put(bundle)
         self._run_after_hooks(stored)
         return stored
+
+    def capture(
+        self,
+        *,
+        state: StateSnapshot | ModelInput,
+        action: ActionRecord | ModelInput,
+        metadata: Metadata | ModelInput,
+        success_summary: str = "completed",
+        re_raise: bool = True,
+    ) -> RecordingContext:
+        """Return a context manager that records a robot action block."""
+        from robot_experience_memory.recorder.context import RecordingContext
+
+        return RecordingContext(
+            self,
+            state=state,
+            action=action,
+            metadata=metadata,
+            success_summary=success_summary,
+            re_raise=re_raise,
+        )
 
     def capture_exception(
         self,
