@@ -3,13 +3,30 @@
 from pathlib import Path
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 class MemoryModel(BaseModel):
     """Base class for immutable memory data models."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
+
+    @field_validator(
+        "experience_id",
+        "state_id",
+        "action_id",
+        "outcome_id",
+        "metadata_id",
+        check_fields=False,
+    )
+    @classmethod
+    def strip_identifier(cls, value: str) -> str:
+        """Normalize and validate identifier fields."""
+        stripped = value.strip()
+        if not stripped:
+            msg = "identifier fields must be non-empty"
+            raise ValueError(msg)
+        return stripped
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the model to a Python dictionary."""
