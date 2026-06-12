@@ -3,6 +3,7 @@
 from robot_experience_memory.retrieval.cache import RetrievalCache
 from robot_experience_memory.retrieval.explanations import explain_match
 from robot_experience_memory.retrieval.interface import RetrievalInterface
+from robot_experience_memory.retrieval.planner import plan_retrieval_query
 from robot_experience_memory.retrieval.query import (
     RetrievalMatch,
     RetrievalQuery,
@@ -38,7 +39,12 @@ class RetrievalEngine(RetrievalInterface):
             cached = self.cache.get(query)
             if cached is not None:
                 return cached
-        bundles = self.store.list()
+        plan = plan_retrieval_query(query)
+        bundles = (
+            self.store.list(filters=plan.filters)
+            if plan.has_pushdown
+            else self.store.list()
+        )
         scores = score_bundles(query, bundles, self.weights)
         temporal_scores = temporal_recency_scores(bundles)
         matches = tuple(
