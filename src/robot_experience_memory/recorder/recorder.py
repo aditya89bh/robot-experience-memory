@@ -20,8 +20,14 @@ ModelInput = Mapping[str, Any]
 class ExperienceRecorder:
     """Record complete robot state-action-outcome episodes to a memory store."""
 
-    def __init__(self, store: MemoryStore) -> None:
+    def __init__(
+        self,
+        store: MemoryStore,
+        *,
+        default_environment: str = "unknown",
+    ) -> None:
         self.store = store
+        self.default_environment = default_environment
 
     def record(
         self,
@@ -31,6 +37,7 @@ class ExperienceRecorder:
         outcome: OutcomeRecord | ModelInput,
         metadata: Metadata | ModelInput,
         experience_id: str | None = None,
+        environment: str | None = None,
     ) -> ExperienceBundle:
         """Build, persist, and return a complete experience bundle."""
         recorded_start = utc_now()
@@ -48,7 +55,7 @@ class ExperienceRecorder:
         outcome_record = self._with_outcome_metric(
             outcome_record, "duration_seconds", duration_seconds
         )
-        metadata_record = self._coerce_metadata(metadata)
+        metadata_record = self._coerce_metadata(metadata, environment=environment)
         metadata_record = self._with_status_tag(metadata_record, outcome_record.success)
         experience = ExperienceRecord(
             experience_id=experience_id or generate_experience_id(),
@@ -75,6 +82,7 @@ class ExperienceRecorder:
         action: ActionRecord | ModelInput,
         metadata: Metadata | ModelInput,
         experience_id: str | None = None,
+        environment: str | None = None,
     ) -> ExperienceBundle:
         """Record an exception as a failed robot experience."""
         exception_type = type(exception).__name__
@@ -88,6 +96,7 @@ class ExperienceRecorder:
             },
             metadata=metadata,
             experience_id=experience_id,
+            environment=environment,
         )
 
     def _coerce_state(self, state: StateSnapshot | ModelInput) -> StateSnapshot:
@@ -111,11 +120,18 @@ class ExperienceRecorder:
         data.setdefault("outcome_id", generate_experience_id("outcome"))
         return OutcomeRecord.model_validate(data)
 
-    def _coerce_metadata(self, metadata: Metadata | ModelInput) -> Metadata:
+    def _coerce_metadata(
+        self, metadata: Metadata | ModelInput, *, environment: str | None = None
+    ) -> Metadata:
         if isinstance(metadata, Metadata):
-            return metadata
+            if environment is None:
+                return metadata
+            return metadata.model_copy(update={"environment": environment})
         data = dict(metadata)
         data.setdefault("metadata_id", generate_experience_id("metadata"))
+        data["environment"] = (
+            environment or data.get("environment") or self.default_environment
+        )
         return Metadata.model_validate(data)
 
     def _with_outcome_metric(
