@@ -42,3 +42,16 @@ class ReplayEvent(MemoryModel):
         if bundle is not None:
             data["experience_id"] = bundle.experience_id
         return cls.model_validate(data)
+
+    def to_visualization_dict(self) -> dict[str, Any]:
+        """Return a JSON-safe replay event shape for future UIs."""
+        bundle = self.bundle
+        return {
+            "event_type": self.event_type,
+            "experience_id": self.experience_id,
+            "robot_id": bundle.metadata.robot_id if bundle is not None else None,
+            "action_type": bundle.action.action_type if bundle is not None else None,
+            "success": bundle.outcome.success if bundle is not None else None,
+            "timestamp": self.timestamp.isoformat(),
+            "summary": bundle.outcome.summary if bundle is not None else None,
+        }
