@@ -7,11 +7,15 @@ from robot_experience_memory.recovery.patterns import (
     FailurePattern,
     detect_failure_patterns,
 )
+from robot_experience_memory.recovery.suggestions import (
+    RecoverySuggestion,
+    SuggestionType,
+)
 
 __all__ = [
     "FailurePattern",
     "RecoveryEngine",
     "RecoveryError",
-    "RecoveryResult",
+    "RecoveryResult", "RecoverySuggestion", "SuggestionType",
     "detect_failure_patterns", "OutcomeCluster", "cluster_outcomes",
 ]

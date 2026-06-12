@@ -1,17 +1,12 @@
 """Rule-based recovery intelligence engine."""
 
-from robot_experience_memory.models.base import MemoryModel
+from robot_experience_memory.recovery.suggestions import (
+    RecoverySuggestion,
+    SuggestionType,
+)
 from robot_experience_memory.store import ExperienceBundle, MemoryStore
 
-
-class RecoveryResult(MemoryModel):
-    """Typed result returned by the initial recovery engine."""
-
-    failed_experience_id: str
-    failure_summary: str
-    similar_failure_count: int
-    suggestion_type: str
-    rationale: str
+RecoveryResult = RecoverySuggestion
 
 
 class RecoveryEngine:
@@ -30,18 +25,20 @@ class RecoveryEngine:
             and bundle.action.action_type == failed_experience.action.action_type
             and bundle.metadata.robot_id == failed_experience.metadata.robot_id
         ]
-        suggestion_type = "retry" if len(similar_failures) <= 1 else "escalate"
-        rationale = (
-            "failure is rare for this robot/action pair"
-            if suggestion_type == "retry"
-            else "similar failures have repeated for this robot/action pair"
-        )
-        return RecoveryResult(
-            failed_experience_id=failed_experience.experience.experience_id,
-            failure_summary=failed_experience.outcome.summary,
-            similar_failure_count=len(similar_failures),
+        suggestion_type: SuggestionType
+        if len(similar_failures) <= 1:
+            suggestion_type = "retry"
+            rationale = "failure is rare for this robot/action pair"
+        else:
+            suggestion_type = "escalate"
+            rationale = "similar failures have repeated for this robot/action pair"
+        return RecoverySuggestion(
             suggestion_type=suggestion_type,
             rationale=rationale,
+            confidence=0.5,
+            related_experience_ids=tuple(
+                bundle.experience.experience_id for bundle in similar_failures
+            ),
         )
 
     analyze_failure = suggest_recovery
