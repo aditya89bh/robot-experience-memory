@@ -13,9 +13,16 @@ RecoveryResult = RecoverySuggestion
 class RecoveryEngine:
     """Analyze stored experiences and suggest deterministic recovery actions."""
 
-    def __init__(self, store: MemoryStore, *, max_retries: int = 1) -> None:
+    def __init__(
+        self,
+        store: MemoryStore,
+        *,
+        max_retries: int = 1,
+        escalation_threshold: int = 3,
+    ) -> None:
         self.store = store
         self.max_retries = max_retries
+        self.escalation_threshold = escalation_threshold
 
     def suggest_recovery(
         self, failed_experience: ExperienceBundle, *, retry_count: int = 0
@@ -38,7 +45,10 @@ class RecoveryEngine:
             and bundle.metadata.robot_id == failed_experience.metadata.robot_id
         ]
         fallback = find_fallback_action(failed_experience, experiences)
-        if retry_count >= self.max_retries:
+        if len(similar_failures) >= self.escalation_threshold:
+            suggestion_type = "escalate"
+            rationale = "repeated failures exceed escalation threshold"
+        elif retry_count >= self.max_retries:
             suggestion_type = "escalate"
             rationale = "retry budget is exhausted"
         elif fallback is not None and len(similar_failures) > self.max_retries:
