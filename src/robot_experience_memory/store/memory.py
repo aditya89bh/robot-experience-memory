@@ -13,13 +13,19 @@ class InMemoryStore(MemoryStore):
         self._bundles: dict[str, ExperienceBundle] = {}
         self._order: list[str] = []
 
-    def put(self, bundle: ExperienceBundle) -> ExperienceBundle:
+    def put(
+        self,
+        bundle: ExperienceBundle,
+        *,
+        allow_overwrite: bool = False,
+    ) -> ExperienceBundle:
         """Persist one bundle, rejecting duplicate experience IDs."""
         experience_id = bundle.experience_id
-        if experience_id in self._bundles:
+        if experience_id in self._bundles and not allow_overwrite:
             raise DuplicateExperienceError(experience_id)
+        if experience_id not in self._bundles:
+            self._order.append(experience_id)
         self._bundles[experience_id] = bundle
-        self._order.append(experience_id)
         return bundle
 
     def get(self, experience_id: str) -> ExperienceBundle | None:

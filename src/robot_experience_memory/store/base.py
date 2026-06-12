@@ -15,16 +15,26 @@ class MemoryStore(ABC):
     """
 
     @abstractmethod
-    def put(self, bundle: ExperienceBundle) -> ExperienceBundle:
+    def put(
+        self,
+        bundle: ExperienceBundle,
+        *,
+        allow_overwrite: bool = False,
+    ) -> ExperienceBundle:
         """Persist one complete experience bundle and return the stored value."""
 
     @abstractmethod
     def get(self, experience_id: str) -> ExperienceBundle | None:
         """Return one complete experience bundle by ID, or ``None`` if missing."""
 
-    def put_many(self, bundles: list[ExperienceBundle]) -> list[ExperienceBundle]:
+    def put_many(
+        self,
+        bundles: list[ExperienceBundle],
+        *,
+        allow_overwrite: bool = False,
+    ) -> list[ExperienceBundle]:
         """Persist multiple complete experience bundles in input order."""
-        return [self.put(bundle) for bundle in bundles]
+        return [self.put(bundle, allow_overwrite=allow_overwrite) for bundle in bundles]
 
     def get_many(self, experience_ids: list[str]) -> list[ExperienceBundle | None]:
         """Retrieve multiple experience bundles in input ID order."""
