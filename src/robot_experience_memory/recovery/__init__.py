@@ -1,5 +1,10 @@
 """Recovery intelligence APIs."""
 
+from robot_experience_memory.recovery.chains import (
+    RecoveryChain,
+    RecoveryChainStep,
+    build_temporal_recovery_chain,
+)
 from robot_experience_memory.recovery.clustering import OutcomeCluster, cluster_outcomes
 from robot_experience_memory.recovery.engine import RecoveryEngine, RecoveryResult
 from robot_experience_memory.recovery.errors import RecoveryError
@@ -28,7 +33,10 @@ __all__ = [
     "FailurePattern",
     "FallbackAction",
     "OutcomeCluster",
+    "RecoveryChain",
+    "RecoveryChainStep",
     "RecoveryEngine",
+    "build_temporal_recovery_chain",
     "RecoveryEvaluationCase",
     "RecoveryEvaluationMetrics",
     "RecoveryError",
