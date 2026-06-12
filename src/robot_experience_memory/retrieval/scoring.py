@@ -20,3 +20,17 @@ def exact_match_score(query: RetrievalQuery, bundle: ExperienceBundle) -> float:
     if not checks:
         return 0.0
     return sum(1 for check in checks if check) / len(checks)
+
+
+def metadata_similarity_score(query: RetrievalQuery, bundle: ExperienceBundle) -> float:
+    """Score robot, environment, and operator metadata similarity."""
+    checks: list[bool] = []
+    if query.robot_id is not None:
+        checks.append(bundle.metadata.robot_id == query.robot_id)
+    if query.environment is not None:
+        checks.append(bundle.metadata.environment == query.environment)
+    if query.operator is not None:
+        checks.append(bundle.metadata.operator == query.operator)
+    if not checks:
+        return 0.0
+    return sum(1 for check in checks if check) / len(checks)

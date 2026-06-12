@@ -8,7 +8,10 @@ from robot_experience_memory.retrieval.query import (
     RetrievalQuery,
     RetrievalResult,
 )
-from robot_experience_memory.retrieval.scoring import exact_match_score
+from robot_experience_memory.retrieval.scoring import (
+    exact_match_score,
+    metadata_similarity_score,
+)
 
 __all__ = [
     "RetrievalEngine",
@@ -18,4 +21,5 @@ __all__ = [
     "RetrievalQuery",
     "RetrievalResult",
     "exact_match_score",
+    "metadata_similarity_score",
 ]
