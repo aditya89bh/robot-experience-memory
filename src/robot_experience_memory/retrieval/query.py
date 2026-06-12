@@ -16,6 +16,7 @@ class RetrievalQuery(MemoryModel):
     success: bool | None = None
     error_code: str | None = None
     tags: tuple[str, ...] = Field(default_factory=tuple)
+    top_k: int | None = Field(default=None, gt=0)
 
 
 class RetrievalMatch(MemoryModel):

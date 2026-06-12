@@ -33,4 +33,6 @@ class RetrievalEngine(RetrievalInterface):
             )
             for bundle in bundles
         )
+        if query.top_k is not None:
+            matches = matches[: query.top_k]
         return RetrievalResult(query=query, matches=matches)
