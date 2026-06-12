@@ -54,3 +54,4 @@ packages = ["robot_experience_memory"]
 
 [project.scripts]
 robot-experience-replay = "robot_experience_memory.replay.cli:main"
+robot-experience-retrieve = "robot_experience_memory.retrieval.cli:main"
