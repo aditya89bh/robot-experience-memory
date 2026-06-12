@@ -80,13 +80,10 @@ class SQLiteMemoryStore(MemoryStore):
         pagination: Pagination | None = None,
     ) -> builtin_list[ExperienceBundle]:
         """Return bundles in SQLite insertion order."""
+        sql, parameters = self._select_with_filters(filters)
         with self._connect() as connection:
-            rows = connection.execute(
-                self._select_sql() + " ORDER BY experiences.rowid ASC"
-            ).fetchall()
+            rows = connection.execute(sql, parameters).fetchall()
         selected = [self._bundle_from_row(row) for row in rows]
-        if filters is not None:
-            selected = [bundle for bundle in selected if filters.matches(bundle)]
         if pagination is not None:
             selected = pagination.apply(selected)
         return selected
@@ -171,6 +168,54 @@ class SQLiteMemoryStore(MemoryStore):
                 bundle.stored_at.isoformat(),
                 bundle.experience.to_json(),
             ),
+        )
+
+    def _select_with_filters(
+        self, filters: ExperienceFilter | None
+    ) -> tuple[str, tuple[object, ...]]:
+        """Build SELECT SQL with safe exact-match pushdown filters."""
+        clauses: list[str] = []
+        parameters: list[object] = []
+        if filters is not None:
+            mapping: tuple[tuple[str, str, object | None], ...] = (
+                ("experiences.experience_id", "=", filters.experience_id),
+                ("experiences.state_id", "=", filters.state_id),
+                ("experiences.action_id", "=", filters.action_id),
+                ("experiences.outcome_id", "=", filters.outcome_id),
+                ("experiences.metadata_id", "=", filters.metadata_id),
+                ("metadata_records.robot_id", "=", filters.robot_id),
+                ("metadata_records.environment", "=", filters.environment),
+                ("metadata_records.operator", "=", filters.operator),
+                ("actions.action_type", "=", filters.action_type),
+                (
+                    "outcomes.success",
+                    "=",
+                    None if filters.success is None else int(filters.success),
+                ),
+                (
+                    "experiences.stored_at",
+                    ">=",
+                    filters.stored_after.isoformat() if filters.stored_after else None,
+                ),
+                (
+                    "experiences.stored_at",
+                    "<=",
+                    filters.stored_before.isoformat()
+                    if filters.stored_before
+                    else None,
+                ),
+            )
+            for column, operator, value in mapping:
+                if value is not None:
+                    clauses.append(f"{column} {operator} ?")
+                    parameters.append(value)
+            if filters.tag is not None:
+                clauses.append("metadata_records.tags_json LIKE ?")
+                parameters.append(f'%"{filters.tag}"%')
+        where = "" if not clauses else " WHERE " + " AND ".join(clauses)
+        return (
+            self._select_sql() + where + " ORDER BY experiences.rowid ASC",
+            tuple(parameters),
         )
 
     def _connect(self) -> sqlite3.Connection:
