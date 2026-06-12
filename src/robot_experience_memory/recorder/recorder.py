@@ -11,10 +11,12 @@ from robot_experience_memory.models import (
     OutcomeRecord,
     StateSnapshot,
 )
+from robot_experience_memory.recorder.sensor_refs import SensorReference
 from robot_experience_memory.store import ExperienceBundle, MemoryStore
 from robot_experience_memory.timestamps import utc_now
 
 ModelInput = Mapping[str, Any]
+SensorReferenceInput = SensorReference | Mapping[str, Any]
 
 
 class ExperienceRecorder:
@@ -41,6 +43,7 @@ class ExperienceRecorder:
         experience_id: str | None = None,
         environment: str | None = None,
         operator: str | None = None,
+        sensor_references: list[SensorReferenceInput] | None = None,
     ) -> ExperienceBundle:
         """Build, persist, and return a complete experience bundle."""
         recorded_start = utc_now()
@@ -58,6 +61,10 @@ class ExperienceRecorder:
         outcome_record = self._with_outcome_metric(
             outcome_record, "duration_seconds", duration_seconds
         )
+        references = self._coerce_sensor_references(sensor_references or [])
+        if references:
+            state_record = self._with_sensor_references(state_record, references)
+            outcome_record = self._with_sensor_artifacts(outcome_record, references)
         metadata_record = self._coerce_metadata(
             metadata, environment=environment, operator=operator
         )
@@ -89,6 +96,7 @@ class ExperienceRecorder:
         experience_id: str | None = None,
         environment: str | None = None,
         operator: str | None = None,
+        sensor_references: list[SensorReferenceInput] | None = None,
     ) -> ExperienceBundle:
         """Record an exception as a failed robot experience."""
         exception_type = type(exception).__name__
@@ -104,6 +112,7 @@ class ExperienceRecorder:
             experience_id=experience_id,
             environment=environment,
             operator=operator,
+            sensor_references=sensor_references,
         )
 
     def _coerce_state(self, state: StateSnapshot | ModelInput) -> StateSnapshot:
@@ -162,3 +171,28 @@ class ExperienceRecorder:
         status_tag = "success" if success else "failure"
         tags = tuple(dict.fromkeys((*metadata.tags, status_tag)))
         return metadata.model_copy(update={"tags": tags})
+
+    def _coerce_sensor_references(
+        self, references: list[SensorReferenceInput]
+    ) -> list[SensorReference]:
+        return [
+            reference
+            if isinstance(reference, SensorReference)
+            else SensorReference.model_validate(dict(reference))
+            for reference in references
+        ]
+
+    def _with_sensor_references(
+        self, state: StateSnapshot, references: list[SensorReference]
+    ) -> StateSnapshot:
+        readings = dict(state.sensor_readings)
+        readings["sensor_references"] = [
+            reference.to_dict() for reference in references
+        ]
+        return state.model_copy(update={"sensor_readings": readings})
+
+    def _with_sensor_artifacts(
+        self, outcome: OutcomeRecord, references: list[SensorReference]
+    ) -> OutcomeRecord:
+        artifacts = [*outcome.artifacts, *(reference.uri for reference in references)]
+        return outcome.model_copy(update={"artifacts": artifacts})

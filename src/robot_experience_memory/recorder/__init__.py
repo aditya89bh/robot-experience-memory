@@ -2,5 +2,6 @@
 
 from robot_experience_memory.recorder.errors import RecorderError
 from robot_experience_memory.recorder.recorder import ExperienceRecorder
+from robot_experience_memory.recorder.sensor_refs import SensorReference
 
-__all__ = ["ExperienceRecorder", "RecorderError"]
+__all__ = ["ExperienceRecorder", "RecorderError", "SensorReference"]
