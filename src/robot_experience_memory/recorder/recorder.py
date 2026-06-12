@@ -25,9 +25,11 @@ class ExperienceRecorder:
         store: MemoryStore,
         *,
         default_environment: str = "unknown",
+        default_operator: str | None = None,
     ) -> None:
         self.store = store
         self.default_environment = default_environment
+        self.default_operator = default_operator
 
     def record(
         self,
@@ -38,6 +40,7 @@ class ExperienceRecorder:
         metadata: Metadata | ModelInput,
         experience_id: str | None = None,
         environment: str | None = None,
+        operator: str | None = None,
     ) -> ExperienceBundle:
         """Build, persist, and return a complete experience bundle."""
         recorded_start = utc_now()
@@ -55,7 +58,9 @@ class ExperienceRecorder:
         outcome_record = self._with_outcome_metric(
             outcome_record, "duration_seconds", duration_seconds
         )
-        metadata_record = self._coerce_metadata(metadata, environment=environment)
+        metadata_record = self._coerce_metadata(
+            metadata, environment=environment, operator=operator
+        )
         metadata_record = self._with_status_tag(metadata_record, outcome_record.success)
         experience = ExperienceRecord(
             experience_id=experience_id or generate_experience_id(),
@@ -83,6 +88,7 @@ class ExperienceRecorder:
         metadata: Metadata | ModelInput,
         experience_id: str | None = None,
         environment: str | None = None,
+        operator: str | None = None,
     ) -> ExperienceBundle:
         """Record an exception as a failed robot experience."""
         exception_type = type(exception).__name__
@@ -97,6 +103,7 @@ class ExperienceRecorder:
             metadata=metadata,
             experience_id=experience_id,
             environment=environment,
+            operator=operator,
         )
 
     def _coerce_state(self, state: StateSnapshot | ModelInput) -> StateSnapshot:
@@ -121,17 +128,27 @@ class ExperienceRecorder:
         return OutcomeRecord.model_validate(data)
 
     def _coerce_metadata(
-        self, metadata: Metadata | ModelInput, *, environment: str | None = None
+        self,
+        metadata: Metadata | ModelInput,
+        *,
+        environment: str | None = None,
+        operator: str | None = None,
     ) -> Metadata:
         if isinstance(metadata, Metadata):
-            if environment is None:
-                return metadata
-            return metadata.model_copy(update={"environment": environment})
+            updates: dict[str, Any] = {}
+            if environment is not None:
+                updates["environment"] = environment
+            if operator is not None:
+                updates["operator"] = operator
+            return metadata.model_copy(update=updates) if updates else metadata
         data = dict(metadata)
         data.setdefault("metadata_id", generate_experience_id("metadata"))
         data["environment"] = (
             environment or data.get("environment") or self.default_environment
         )
+        selected_operator = operator or data.get("operator") or self.default_operator
+        if selected_operator is not None:
+            data["operator"] = selected_operator
         return Metadata.model_validate(data)
 
     def _with_outcome_metric(
