@@ -95,3 +95,18 @@ print(report.total_experiences)
 Replay is structured and inspectable; it does not control a physical robot. See
 `docs/replay.md` for filtering, deterministic mode, callbacks, interruption, and
 CLI usage.
+
+## Recovery Intelligence
+
+Phase 5 adds deterministic recovery suggestions for failed experiences. The recovery engine inspects stored `ExperienceBundle` records and recommends `retry`, `fallback`, or `escalate` without ML, LLMs, or robot control.
+
+```python
+from robot_experience_memory.recovery import RecoveryEngine
+
+engine = RecoveryEngine(store)
+suggestion = engine.suggest_recovery(failed_experience)
+print(suggestion.suggestion_type, suggestion.confidence)
+```
+
+See [docs/recovery.md](docs/recovery.md) for policies, traces, examples, and evaluation notes.
+
