@@ -32,11 +32,12 @@ class ReplayEvent(MemoryModel):
         event_type: ReplayEventType,
         *,
         bundle: ExperienceBundle | None = None,
+        timestamp: datetime | None = None,
     ) -> "ReplayEvent":
         """Create a replay event with a UTC timestamp."""
         data: dict[str, Any] = {
             "event_type": event_type,
-            "timestamp": utc_now(),
+            "timestamp": timestamp or utc_now(),
             "bundle": bundle,
         }
         if bundle is not None:
