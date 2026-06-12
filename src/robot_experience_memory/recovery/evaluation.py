@@ -5,7 +5,9 @@ from collections.abc import Iterable
 from pydantic import Field
 
 from robot_experience_memory.models.base import MemoryModel
+from robot_experience_memory.recovery.chains import build_temporal_recovery_chain
 from robot_experience_memory.recovery.engine import RecoveryEngine
+from robot_experience_memory.recovery.scoring import score_recovery_sequence
 from robot_experience_memory.recovery.suggestions import SuggestionType
 from robot_experience_memory.store import ExperienceBundle, InMemoryStore
 
@@ -28,6 +30,8 @@ class RecoveryEvaluationMetrics(MemoryModel):
     suggested_escalation: int = Field(ge=0)
     average_confidence: float = Field(ge=0.0, le=1.0)
     correct_expected_suggestion_rate: float = Field(ge=0.0, le=1.0)
+    resolved_sequence_rate: float = Field(default=0.0, ge=0.0, le=1.0)
+    average_sequence_score: float = Field(default=0.0, ge=0.0, le=1.0)
 
 
 def evaluate_recovery_cases(
@@ -39,6 +43,8 @@ def evaluate_recovery_cases(
     fallback = 0
     escalation = 0
     confidence_total = 0.0
+    sequence_score_total = 0.0
+    resolved_sequences = 0
     correct = 0
     for case in case_list:
         store = InMemoryStore()
@@ -58,6 +64,11 @@ def evaluate_recovery_cases(
         elif suggestion.suggestion_type == "escalate":
             escalation += 1
         confidence_total += suggestion.confidence
+        chain = build_temporal_recovery_chain(failed, list(case.experiences))
+        sequence_score = score_recovery_sequence(chain)
+        sequence_score_total += sequence_score.score
+        if sequence_score.resolved:
+            resolved_sequences += 1
         if suggestion.suggestion_type == case.expected_suggestion_type:
             correct += 1
     total = len(case_list)
@@ -68,4 +79,6 @@ def evaluate_recovery_cases(
         suggested_escalation=escalation,
         average_confidence=round(confidence_total / total, 4) if total else 0.0,
         correct_expected_suggestion_rate=round(correct / total, 4) if total else 0.0,
+        resolved_sequence_rate=round(resolved_sequences / total, 4) if total else 0.0,
+        average_sequence_score=round(sequence_score_total / total, 4) if total else 0.0,
     )
