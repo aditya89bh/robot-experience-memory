@@ -11,6 +11,12 @@ from robot_experience_memory.models import (
     OutcomeRecord,
     StateSnapshot,
 )
+from robot_experience_memory.recorder.errors import RecorderHookError
+from robot_experience_memory.recorder.hooks import (
+    AfterRecordHook,
+    BeforeRecordHook,
+    RecordContext,
+)
 from robot_experience_memory.recorder.sensor_refs import SensorReference
 from robot_experience_memory.store import ExperienceBundle, MemoryStore
 from robot_experience_memory.timestamps import utc_now
@@ -28,10 +34,14 @@ class ExperienceRecorder:
         *,
         default_environment: str = "unknown",
         default_operator: str | None = None,
+        before_record_hooks: list[BeforeRecordHook] | None = None,
+        after_record_hooks: list[AfterRecordHook] | None = None,
     ) -> None:
         self.store = store
         self.default_environment = default_environment
         self.default_operator = default_operator
+        self.before_record_hooks = before_record_hooks or []
+        self.after_record_hooks = after_record_hooks or []
 
     def record(
         self,
@@ -84,7 +94,10 @@ class ExperienceRecorder:
             metadata=metadata_record,
             stored_at=recorded_end,
         )
-        return self.store.put(bundle)
+        self._run_before_hooks(bundle)
+        stored = self.store.put(bundle)
+        self._run_after_hooks(stored)
+        return stored
 
     def capture_exception(
         self,
@@ -196,3 +209,18 @@ class ExperienceRecorder:
     ) -> OutcomeRecord:
         artifacts = [*outcome.artifacts, *(reference.uri for reference in references)]
         return outcome.model_copy(update={"artifacts": artifacts})
+
+    def _run_before_hooks(self, bundle: ExperienceBundle) -> None:
+        context = RecordContext(bundle=bundle)
+        for hook in self.before_record_hooks:
+            try:
+                hook(context)
+            except Exception as exc:  # noqa: BLE001
+                raise RecorderHookError("before_record hook failed") from exc
+
+    def _run_after_hooks(self, bundle: ExperienceBundle) -> None:
+        for hook in self.after_record_hooks:
+            try:
+                hook(bundle)
+            except Exception as exc:  # noqa: BLE001
+                raise RecorderHookError("after_record hook failed") from exc
