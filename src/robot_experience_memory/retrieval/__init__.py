@@ -1,5 +1,6 @@
 """Similar experience retrieval APIs."""
 
+from robot_experience_memory.retrieval.cache import RetrievalCache
 from robot_experience_memory.retrieval.engine import RetrievalEngine
 from robot_experience_memory.retrieval.errors import RetrievalError
 from robot_experience_memory.retrieval.explanations import (
@@ -26,6 +27,7 @@ from robot_experience_memory.retrieval.scoring import (
 )
 
 __all__ = [
+    "RetrievalCache",
     "RetrievalEngine",
     "RetrievalError",
     "RetrievalExplanation",

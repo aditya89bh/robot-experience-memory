@@ -1,5 +1,6 @@
 """Deterministic similar-experience retrieval engine."""
 
+from robot_experience_memory.retrieval.cache import RetrievalCache
 from robot_experience_memory.retrieval.explanations import explain_match
 from robot_experience_memory.retrieval.interface import RetrievalInterface
 from robot_experience_memory.retrieval.query import (
@@ -20,13 +21,23 @@ class RetrievalEngine(RetrievalInterface):
     """Retrieve relevant past experiences from a memory store."""
 
     def __init__(
-        self, store: MemoryStore, *, weights: RetrievalWeights | None = None
+        self,
+        store: MemoryStore,
+        *,
+        weights: RetrievalWeights | None = None,
+        cache_enabled: bool = True,
     ) -> None:
         self.store = store
         self.weights = weights or RetrievalWeights()
+        self.cache_enabled = cache_enabled
+        self.cache = RetrievalCache()
 
     def retrieve(self, query: RetrievalQuery) -> RetrievalResult:
         """Return stored experiences for a query."""
+        if self.cache_enabled:
+            cached = self.cache.get(query)
+            if cached is not None:
+                return cached
         bundles = self.store.list()
         scores = score_bundles(query, bundles, self.weights)
         temporal_scores = temporal_recency_scores(bundles)
@@ -47,4 +58,7 @@ class RetrievalEngine(RetrievalInterface):
         matches = rank_matches(matches)
         if query.top_k is not None:
             matches = matches[: query.top_k]
-        return RetrievalResult(query=query, matches=matches)
+        result = RetrievalResult(query=query, matches=matches)
+        if self.cache_enabled:
+            self.cache.set(query, result)
+        return result
