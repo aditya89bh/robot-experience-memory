@@ -1,6 +1,5 @@
 from robot_experience_memory.retrieval import (
     RetrievalEngine,
-    RetrievalMatch,
     RetrievalQuery,
     RetrievalResult,
 )
@@ -17,4 +16,6 @@ def test_retrieval_engine_returns_typed_result() -> None:
 
     assert isinstance(result, RetrievalResult)
     assert result.query.action_type == "navigate"
-    assert result.matches == (RetrievalMatch(experience=bundle, score=1.0),)
+    assert len(result.matches) == 1
+    assert result.matches[0].experience == bundle
+    assert result.matches[0].score == 1.0

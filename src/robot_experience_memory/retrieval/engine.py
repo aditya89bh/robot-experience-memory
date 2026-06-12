@@ -1,5 +1,6 @@
 """Deterministic similar-experience retrieval engine."""
 
+from robot_experience_memory.retrieval.explanations import explain_match
 from robot_experience_memory.retrieval.interface import RetrievalInterface
 from robot_experience_memory.retrieval.query import (
     RetrievalMatch,
@@ -11,6 +12,7 @@ from robot_experience_memory.retrieval.ranking import (
     rank_matches,
     score_bundles,
 )
+from robot_experience_memory.retrieval.scoring import temporal_recency_scores
 from robot_experience_memory.store import MemoryStore
 
 
@@ -27,10 +29,18 @@ class RetrievalEngine(RetrievalInterface):
         """Return stored experiences for a query."""
         bundles = self.store.list()
         scores = score_bundles(query, bundles, self.weights)
+        temporal_scores = temporal_recency_scores(bundles)
         matches = tuple(
             RetrievalMatch(
                 experience=bundle,
                 score=scores[bundle.experience.experience_id],
+                explanation=explain_match(
+                    query,
+                    bundle,
+                    temporal_score=temporal_scores.get(
+                        bundle.experience.experience_id, 0.0
+                    ),
+                ),
             )
             for bundle in bundles
         )

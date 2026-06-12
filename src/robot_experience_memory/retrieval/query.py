@@ -24,6 +24,7 @@ class RetrievalMatch(MemoryModel):
 
     experience: ExperienceBundle
     score: float = Field(ge=0.0, le=1.0)
+    explanation: object | None = None
 
 
 class RetrievalResult(MemoryModel):
