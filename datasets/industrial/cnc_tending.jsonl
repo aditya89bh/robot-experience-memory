@@ -1,0 +1,5 @@
+{"experience_id":"cnc-001","robot_id":"cnc-tender-1","environment":"cnc-cell-a","action_type":"load_raw_stock","success":true,"error_code":null,"tags":["cnc","tending","load"],"summary":"loaded raw billet into chuck"}
+{"experience_id":"cnc-002","robot_id":"cnc-tender-1","environment":"cnc-cell-a","action_type":"close_chuck","success":true,"error_code":null,"tags":["cnc","tending","fixture"],"summary":"confirmed hydraulic chuck close"}
+{"experience_id":"cnc-003","robot_id":"cnc-tender-1","environment":"cnc-cell-a","action_type":"unload_part","success":false,"error_code":"gripper_slip","tags":["cnc","tending","unload"],"summary":"part slipped during unload after coolant residue"}
+{"experience_id":"cnc-004","robot_id":"cnc-tender-1","environment":"cnc-cell-a","action_type":"wipe_part","success":true,"error_code":null,"tags":["cnc","tending","recovery"],"summary":"wiped coolant before retry"}
+{"experience_id":"cnc-005","robot_id":"cnc-tender-1","environment":"cnc-cell-a","action_type":"unload_part","success":true,"error_code":null,"tags":["cnc","tending","unload"],"summary":"unloaded part after wiping coolant"}
