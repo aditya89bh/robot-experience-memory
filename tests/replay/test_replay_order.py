@@ -8,7 +8,7 @@ def test_replay_preserves_stable_store_order() -> None:
     store.put(make_bundle("exp-1"))
     store.put(make_bundle("exp-2"))
 
-    events = ReplayEngine(store).replay()
+    events = ReplayEngine(store).replay().events
     started_ids = [
         event.experience_id
         for event in events
@@ -22,7 +22,7 @@ def test_replay_emits_sequential_bundle_events() -> None:
     store = InMemoryStore()
     store.put(make_bundle("exp-1"))
 
-    events = ReplayEngine(store).replay()
+    events = ReplayEngine(store).replay().events
 
     assert [event.event_type for event in events] == [
         "replay_started",

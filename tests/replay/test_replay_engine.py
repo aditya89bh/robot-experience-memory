@@ -7,7 +7,7 @@ def test_replay_engine_replays_store_bundles_as_events() -> None:
     store = InMemoryStore()
     store.put(make_bundle("exp-1"))
 
-    events = ReplayEngine(store).replay()
+    events = ReplayEngine(store).replay().events
 
     assert [event.event_type for event in events] == [
         "replay_started",

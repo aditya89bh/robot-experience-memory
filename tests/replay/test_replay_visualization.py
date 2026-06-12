@@ -7,7 +7,7 @@ def test_replay_event_visualization_dict_is_json_safe() -> None:
     store = InMemoryStore()
     store.put(make_bundle("exp-1", robot_id="robot-a", action_type="navigate"))
 
-    event = ReplayEngine(store).replay()[1]
+    event = ReplayEngine(store).replay().events[1]
     data = event.to_visualization_dict()
 
     assert data == {
