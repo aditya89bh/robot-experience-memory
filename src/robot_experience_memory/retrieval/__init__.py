@@ -11,6 +11,7 @@ from robot_experience_memory.retrieval.query import (
 from robot_experience_memory.retrieval.scoring import (
     exact_match_score,
     metadata_similarity_score,
+    tag_similarity_score,
 )
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "RetrievalResult",
     "exact_match_score",
     "metadata_similarity_score",
+    "tag_similarity_score",
 ]

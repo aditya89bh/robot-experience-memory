@@ -34,3 +34,14 @@ def metadata_similarity_score(query: RetrievalQuery, bundle: ExperienceBundle) -
     if not checks:
         return 0.0
     return sum(1 for check in checks if check) / len(checks)
+
+
+def tag_similarity_score(query: RetrievalQuery, bundle: ExperienceBundle) -> float:
+    """Score tag overlap using Jaccard similarity."""
+    query_tags = set(query.tags)
+    bundle_tags = set(bundle.metadata.tags)
+    if not query_tags and not bundle_tags:
+        return 0.0
+    if not query_tags or not bundle_tags:
+        return 0.0
+    return len(query_tags & bundle_tags) / len(query_tags | bundle_tags)
