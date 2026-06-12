@@ -1,5 +1,6 @@
 """Recovery intelligence APIs."""
 
+from robot_experience_memory.recovery.clustering import OutcomeCluster, cluster_outcomes
 from robot_experience_memory.recovery.engine import RecoveryEngine, RecoveryResult
 from robot_experience_memory.recovery.errors import RecoveryError
 from robot_experience_memory.recovery.patterns import (
@@ -12,5 +13,5 @@ __all__ = [
     "RecoveryEngine",
     "RecoveryError",
     "RecoveryResult",
-    "detect_failure_patterns",
+    "detect_failure_patterns", "OutcomeCluster", "cluster_outcomes",
 ]
