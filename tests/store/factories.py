@@ -21,6 +21,7 @@ def make_bundle(
     success: bool = True,
     action_type: str = "navigate",
     stored_at: datetime | None = None,
+    error_code: str | None = None,
 ) -> ExperienceBundle:
     suffix = experience_id.removeprefix("exp-")
     return ExperienceBundle(
@@ -41,6 +42,7 @@ def make_bundle(
             outcome_id=f"outcome-{suffix}",
             success=success,
             summary="ok" if success else "failed",
+            error_code=error_code,
         ),
         metadata=Metadata(
             metadata_id=f"metadata-{suffix}",

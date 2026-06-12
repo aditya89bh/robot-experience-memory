@@ -32,6 +32,7 @@ def test_find_fallback_action_from_successful_alternate_action() -> None:
         action_type="reroute",
         success_count=1,
         experience_ids=("exp-2",),
+        causal_error_code="blocked",
     )
 
 
