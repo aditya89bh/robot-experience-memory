@@ -17,6 +17,12 @@ class ReplayEngine:
         events = [ReplayEvent.create("replay_started")]
         for bundle in self.store.list():
             events.append(ReplayEvent.create("experience_started", bundle=bundle))
+            if self.config.include_state_events:
+                events.append(ReplayEvent.create("state_observed", bundle=bundle))
+            if self.config.include_action_events:
+                events.append(ReplayEvent.create("action_replayed", bundle=bundle))
+            if self.config.include_outcome_events:
+                events.append(ReplayEvent.create("outcome_observed", bundle=bundle))
             events.append(ReplayEvent.create("experience_completed", bundle=bundle))
         events.append(ReplayEvent.create("replay_completed"))
         return events

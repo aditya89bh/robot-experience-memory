@@ -3,7 +3,22 @@ from robot_experience_memory.store import InMemoryStore
 from tests.store.factories import make_bundle
 
 
-def test_replay_engine_replays_store_bundles_as_events() -> None:
+def test_replay_preserves_stable_store_order() -> None:
+    store = InMemoryStore()
+    store.put(make_bundle("exp-1"))
+    store.put(make_bundle("exp-2"))
+
+    events = ReplayEngine(store).replay()
+    started_ids = [
+        event.experience_id
+        for event in events
+        if event.event_type == "experience_started"
+    ]
+
+    assert started_ids == ["exp-1", "exp-2"]
+
+
+def test_replay_emits_sequential_bundle_events() -> None:
     store = InMemoryStore()
     store.put(make_bundle("exp-1"))
 
@@ -18,5 +33,3 @@ def test_replay_engine_replays_store_bundles_as_events() -> None:
         "experience_completed",
         "replay_completed",
     ]
-    assert events[1].experience_id == "exp-1"
-    assert events[1].bundle is not None

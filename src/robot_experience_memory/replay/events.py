@@ -10,6 +10,9 @@ from robot_experience_memory.timestamps import utc_now
 ReplayEventType = Literal[
     "replay_started",
     "experience_started",
+    "state_observed",
+    "action_replayed",
+    "outcome_observed",
     "experience_completed",
     "replay_completed",
 ]
