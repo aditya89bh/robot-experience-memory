@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from collections.abc import Callable, Mapping
+from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar
 
 from robot_experience_memory.identifiers import generate_experience_id
 from robot_experience_memory.models import (
@@ -25,6 +25,8 @@ from robot_experience_memory.timestamps import utc_now
 
 ModelInput = Mapping[str, Any]
 SensorReferenceInput = SensorReference | Mapping[str, Any]
+P = ParamSpec("P")
+R = TypeVar("R")
 
 if TYPE_CHECKING:
     from robot_experience_memory.recorder.context import RecordingContext
@@ -103,6 +105,30 @@ class ExperienceRecorder:
         stored = self.store.put(bundle)
         self._run_after_hooks(stored)
         return stored
+
+    def record_function(
+        self,
+        *,
+        state: StateSnapshot | ModelInput,
+        action: ActionRecord | ModelInput,
+        metadata: Metadata | ModelInput,
+        re_raise: bool = True,
+    ) -> Callable[[Callable[P, R]], Callable[P, R | None]]:
+        """Decorate a function and record its execution."""
+
+        def decorator(function: Callable[P, R]) -> Callable[P, R | None]:
+            from robot_experience_memory.recorder.decorators import recording_decorator
+
+            return recording_decorator(
+                function,
+                recorder=self,
+                state=state,
+                action=action,
+                metadata=metadata,
+                re_raise=re_raise,
+            )
+
+        return decorator
 
     def capture(
         self,
