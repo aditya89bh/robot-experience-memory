@@ -18,6 +18,10 @@ from robot_experience_memory.recovery.patterns import (
     detect_failure_patterns,
 )
 from robot_experience_memory.recovery.policies import RecoveryPolicy
+from robot_experience_memory.recovery.scoring import (
+    RecoverySequenceScore,
+    score_recovery_sequence,
+)
 from robot_experience_memory.recovery.strategies import (
     FallbackAction,
     find_fallback_action,
@@ -42,6 +46,7 @@ __all__ = [
     "RecoveryError",
     "RecoveryPolicy",
     "RecoveryResult",
+    "RecoverySequenceScore",
     "RecoverySuggestion",
     "RecoveryTrace",
     "SuggestionType",
@@ -50,4 +55,5 @@ __all__ = [
     "evaluate_recovery_cases",
     "find_fallback_action",
     "score_confidence",
+    "score_recovery_sequence",
 ]
