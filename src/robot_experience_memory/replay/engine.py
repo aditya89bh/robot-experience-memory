@@ -4,7 +4,7 @@ import time
 
 from robot_experience_memory.replay.config import ReplayConfig
 from robot_experience_memory.replay.events import ReplayEvent
-from robot_experience_memory.store import MemoryStore
+from robot_experience_memory.store import ExperienceFilter, MemoryStore, Pagination
 
 
 class ReplayEngine:
@@ -14,10 +14,15 @@ class ReplayEngine:
         self.store = store
         self.config = config or ReplayConfig()
 
-    def replay(self) -> list[ReplayEvent]:
-        """Replay all stored bundles and return structured replay events."""
+    def replay(
+        self,
+        *,
+        filters: ExperienceFilter | None = None,
+        pagination: Pagination | None = None,
+    ) -> list[ReplayEvent]:
+        """Replay selected stored bundles and return structured replay events."""
         events = [ReplayEvent.create("replay_started")]
-        for bundle in self.store.list():
+        for bundle in self.store.list(filters=filters, pagination=pagination):
             events.append(ReplayEvent.create("experience_started", bundle=bundle))
             if self.config.include_state_events:
                 events.append(ReplayEvent.create("state_observed", bundle=bundle))
