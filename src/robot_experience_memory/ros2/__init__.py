@@ -4,6 +4,13 @@ This package is safe to import without ROS2 installed. Helpers that need real
 ROS2 APIs perform lazy imports and raise OptionalDependencyError when required.
 """
 
+from robot_experience_memory.ros2.adapters import (
+    action_from_execution_event,
+    bundle_from_execution_event,
+    metadata_from_execution_event,
+    outcome_from_execution_event,
+    state_from_execution_event,
+)
 from robot_experience_memory.ros2.availability import (
     import_rclpy,
     is_rclpy_available,
@@ -16,8 +23,13 @@ from robot_experience_memory.ros2.errors import (
 
 __all__ = [
     "OptionalDependencyError",
+    "action_from_execution_event",
+    "bundle_from_execution_event",
     "ROS2IntegrationError",
     "import_rclpy",
     "is_rclpy_available",
+    "metadata_from_execution_event",
+    "outcome_from_execution_event",
     "require_rclpy",
+    "state_from_execution_event",
 ]
