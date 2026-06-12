@@ -66,3 +66,14 @@ Each suggestion can include a `RecoveryTrace` with matched experience IDs, rules
 ## Evaluation
 
 Phase 5 includes deterministic evaluation scenarios in `robot_experience_memory.recovery.evaluation`. The suite reports total cases, suggestion counts, average confidence, and expected-suggestion accuracy.
+
+## Evaluation metrics
+
+The evaluation suite exposes `evaluate_recovery_cases(...)`, returning:
+
+- `total_cases`
+- `suggested_retry`
+- `suggested_fallback`
+- `suggested_escalation`
+- `average_confidence`
+- `correct_expected_suggestion_rate`

@@ -3,6 +3,11 @@
 from robot_experience_memory.recovery.clustering import OutcomeCluster, cluster_outcomes
 from robot_experience_memory.recovery.engine import RecoveryEngine, RecoveryResult
 from robot_experience_memory.recovery.errors import RecoveryError
+from robot_experience_memory.recovery.evaluation import (
+    RecoveryEvaluationCase,
+    RecoveryEvaluationMetrics,
+    evaluate_recovery_cases,
+)
 from robot_experience_memory.recovery.patterns import (
     FailurePattern,
     detect_failure_patterns,
@@ -24,6 +29,8 @@ __all__ = [
     "FallbackAction",
     "OutcomeCluster",
     "RecoveryEngine",
+    "RecoveryEvaluationCase",
+    "RecoveryEvaluationMetrics",
     "RecoveryError",
     "RecoveryPolicy",
     "RecoveryResult",
@@ -32,6 +39,7 @@ __all__ = [
     "SuggestionType",
     "cluster_outcomes",
     "detect_failure_patterns",
+    "evaluate_recovery_cases",
     "find_fallback_action",
     "score_confidence",
 ]
