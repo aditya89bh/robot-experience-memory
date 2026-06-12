@@ -15,6 +15,7 @@ ReplayEventType = Literal[
     "outcome_observed",
     "experience_completed",
     "replay_completed",
+    "replay_interrupted",
 ]
 
 
