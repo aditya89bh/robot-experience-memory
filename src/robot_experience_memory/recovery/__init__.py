@@ -17,6 +17,7 @@ from robot_experience_memory.recovery.suggestions import (
     RecoverySuggestion,
     SuggestionType,
 )
+from robot_experience_memory.recovery.traces import RecoveryTrace
 
 __all__ = [
     "FailurePattern",
@@ -27,6 +28,7 @@ __all__ = [
     "RecoveryPolicy",
     "RecoveryResult",
     "RecoverySuggestion",
+    "RecoveryTrace",
     "SuggestionType",
     "cluster_outcomes",
     "detect_failure_patterns",
