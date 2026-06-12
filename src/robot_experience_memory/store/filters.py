@@ -19,6 +19,7 @@ class ExperienceFilter(MemoryModel):
     metadata_id: str | None = None
     robot_id: str | None = None
     environment: str | None = None
+    operator: str | None = None
     tag: str | None = None
     success: bool | None = None
     action_type: str | None = None
@@ -55,6 +56,7 @@ class ExperienceFilter(MemoryModel):
             or bundle.experience.metadata_id == self.metadata_id,
             self.robot_id is None or bundle.metadata.robot_id == self.robot_id,
             self.environment is None or bundle.metadata.environment == self.environment,
+            self.operator is None or bundle.metadata.operator == self.operator,
             self.tag is None or self.tag in bundle.metadata.tags,
             self.success is None or bundle.outcome.success is self.success,
             self.action_type is None or bundle.action.action_type == self.action_type,

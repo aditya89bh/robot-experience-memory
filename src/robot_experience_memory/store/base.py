@@ -44,6 +44,23 @@ class MemoryStore(ABC):
         """Retrieve multiple experience bundles in input ID order."""
         return [self.get(experience_id) for experience_id in experience_ids]
 
+
+    def query_by_robot_id(self, robot_id: str) -> list[ExperienceBundle]:
+        """Return experiences recorded for a robot."""
+        return self.list(filters=ExperienceFilter(robot_id=robot_id))
+
+    def query_by_environment(self, environment: str) -> list[ExperienceBundle]:
+        """Return experiences recorded in an environment."""
+        return self.list(filters=ExperienceFilter(environment=environment))
+
+    def query_by_tag(self, tag: str) -> list[ExperienceBundle]:
+        """Return experiences carrying a metadata tag."""
+        return self.list(filters=ExperienceFilter(tag=tag))
+
+    def query_by_operator(self, operator: str) -> list[ExperienceBundle]:
+        """Return experiences associated with an operator."""
+        return self.list(filters=ExperienceFilter(operator=operator))
+
     @abstractmethod
     def list(
         self,

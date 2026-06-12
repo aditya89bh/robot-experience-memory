@@ -16,6 +16,7 @@ def make_bundle(
     *,
     robot_id: str = "robot-a",
     environment: str = "lab",
+    operator: str | None = "aditya",
     tag: str = "nav",
     success: bool = True,
     action_type: str = "navigate",
@@ -44,6 +45,7 @@ def make_bundle(
         metadata=Metadata(
             metadata_id=f"metadata-{suffix}",
             robot_id=robot_id,
+            operator=operator,
             environment=environment,
             tags=(tag,),
         ),

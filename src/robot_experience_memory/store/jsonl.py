@@ -18,6 +18,9 @@ class JSONLMemoryStore(MemoryStore):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.path.touch(exist_ok=True)
+        self._bundles: dict[str, ExperienceBundle] = {}
+        self._order: builtin_list[str] = []
+        self._load_index()
 
     def put(
         self,
@@ -31,15 +34,12 @@ class JSONLMemoryStore(MemoryStore):
             raise DuplicateExperienceError(bundle.experience_id)
         with self.path.open("a", encoding="utf-8") as file:
             file.write(bundle.to_json().replace("\n", "") + "\n")
+        self._index_bundle(bundle)
         return bundle
 
     def get(self, experience_id: str) -> ExperienceBundle | None:
         """Return the latest bundle for an experience ID."""
-        found: ExperienceBundle | None = None
-        for bundle in self._read_all_raw():
-            if bundle.experience_id == experience_id:
-                found = bundle
-        return found
+        return self._bundles.get(experience_id)
 
     def list(
         self,
@@ -47,13 +47,7 @@ class JSONLMemoryStore(MemoryStore):
         pagination: Pagination | None = None,
     ) -> builtin_list[ExperienceBundle]:
         """Return latest bundles in first-inserted stable order."""
-        latest: dict[str, ExperienceBundle] = {}
-        order: builtin_list[str] = []
-        for bundle in self._read_all_raw():
-            if bundle.experience_id not in latest:
-                order.append(bundle.experience_id)
-            latest[bundle.experience_id] = bundle
-        selected = [latest[experience_id] for experience_id in order]
+        selected = [self._bundles[experience_id] for experience_id in self._order]
         if filters is not None:
             selected = [bundle for bundle in selected if filters.matches(bundle)]
         if pagination is not None:
@@ -66,3 +60,24 @@ class JSONLMemoryStore(MemoryStore):
             if line.strip():
                 bundles.append(ExperienceBundle.from_json(line))
         return bundles
+
+    def indexed_fields(self) -> tuple[str, ...]:
+        """Return fields indexed from the JSONL file on load."""
+        return (
+            "experience_id",
+            "robot_id",
+            "environment",
+            "operator",
+            "success",
+            "action_type",
+            "tag",
+        )
+
+    def _load_index(self) -> None:
+        for bundle in self._read_all_raw():
+            self._index_bundle(bundle)
+
+    def _index_bundle(self, bundle: ExperienceBundle) -> None:
+        if bundle.experience_id not in self._bundles:
+            self._order.append(bundle.experience_id)
+        self._bundles[bundle.experience_id] = bundle

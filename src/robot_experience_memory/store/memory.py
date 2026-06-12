@@ -12,6 +12,12 @@ class InMemoryStore(MemoryStore):
     def __init__(self) -> None:
         self._bundles: dict[str, ExperienceBundle] = {}
         self._order: list[str] = []
+        self._by_robot_id: dict[str, set[str]] = {}
+        self._by_environment: dict[str, set[str]] = {}
+        self._by_operator: dict[str, set[str]] = {}
+        self._by_success: dict[bool, set[str]] = {}
+        self._by_action_type: dict[str, set[str]] = {}
+        self._by_tag: dict[str, set[str]] = {}
 
     def put(
         self,
@@ -26,6 +32,7 @@ class InMemoryStore(MemoryStore):
             raise DuplicateExperienceError(experience_id)
         self._order.append(experience_id)
         self._bundles[experience_id] = bundle
+        self._index_bundle(bundle)
         return bundle
 
     def get(self, experience_id: str) -> ExperienceBundle | None:
@@ -44,3 +51,32 @@ class InMemoryStore(MemoryStore):
         if pagination is not None:
             selected = pagination.apply(selected)
         return selected
+
+    def indexed_fields(self) -> tuple[str, ...]:
+        """Return fields maintained as in-memory indexes."""
+        return (
+            "experience_id",
+            "robot_id",
+            "environment",
+            "operator",
+            "success",
+            "action_type",
+            "tag",
+        )
+
+    def _index_bundle(self, bundle: ExperienceBundle) -> None:
+        experience_id = bundle.experience_id
+        self._by_robot_id.setdefault(bundle.metadata.robot_id, set()).add(experience_id)
+        self._by_environment.setdefault(bundle.metadata.environment, set()).add(
+            experience_id
+        )
+        if bundle.metadata.operator is not None:
+            self._by_operator.setdefault(bundle.metadata.operator, set()).add(
+                experience_id
+            )
+        self._by_success.setdefault(bundle.outcome.success, set()).add(experience_id)
+        self._by_action_type.setdefault(bundle.action.action_type, set()).add(
+            experience_id
+        )
+        for tag in bundle.metadata.tags:
+            self._by_tag.setdefault(tag, set()).add(experience_id)
