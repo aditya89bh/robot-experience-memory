@@ -65,6 +65,33 @@ robot_memories = store.query_by_robot_id("robot-a")
 
 See `docs/storage.md` for the full storage backend guide.
 
+## Optional ROS2 Integration
+
+Phase 7 adds optional ROS2 helpers under `robot_experience_memory.ros2` for
+recording ROS-style action executions, publishing outcomes and replay events,
+referencing rosbags, adapting lifecycle nodes, and wiring retrieval/recovery
+service callbacks. ROS2 is not a required dependency: normal imports and tests
+work without `rclpy` installed, and ROS2-only availability checks raise a clear
+`OptionalDependencyError` when needed.
+
+```python
+from robot_experience_memory.recorder import ExperienceRecorder
+from robot_experience_memory.ros2 import capture_action_execution
+from robot_experience_memory.store import InMemoryStore
+
+recorder = ExperienceRecorder(InMemoryStore())
+bundle = capture_action_execution(
+    recorder,
+    action_type="navigate",
+    state={"battery_level": 90.0},
+    command="navigate_to_pose",
+    success=True,
+    summary="goal reached",
+)
+```
+
+See `docs/ros2.md` and the `examples/ros2_*` files for integration patterns.
+
 ## Recorder Example
 
 ```python
