@@ -3,7 +3,9 @@
 import time
 from dataclasses import dataclass
 
+from robot_experience_memory.replay.callbacks import ReplayEventCallback
 from robot_experience_memory.replay.config import ReplayConfig
+from robot_experience_memory.replay.errors import ReplayCallbackError
 from robot_experience_memory.replay.events import ReplayEvent
 from robot_experience_memory.replay.statistics import ReplayStatistics, build_statistics
 from robot_experience_memory.store import (
@@ -25,9 +27,15 @@ class ReplayResult:
 class ReplayEngine:
     """Replay stored experience bundles as structured events."""
 
-    def __init__(self, store: MemoryStore, config: ReplayConfig | None = None) -> None:
+    def __init__(
+        self,
+        store: MemoryStore,
+        config: ReplayConfig | None = None,
+        callbacks: list[ReplayEventCallback] | None = None,
+    ) -> None:
         self.store = store
         self.config = config or ReplayConfig()
+        self.callbacks = callbacks or []
 
     def replay(
         self,
@@ -38,19 +46,24 @@ class ReplayEngine:
         """Replay selected stored bundles and return events with statistics."""
         started = time.monotonic()
         replayed_bundles: list[ExperienceBundle] = []
-        events = [ReplayEvent.create("replay_started")]
+        events: list[ReplayEvent] = []
+        self._emit(events, ReplayEvent.create("replay_started"))
         for bundle in self.store.list(filters=filters, pagination=pagination):
             replayed_bundles.append(bundle)
-            events.append(ReplayEvent.create("experience_started", bundle=bundle))
+            self._emit(events, ReplayEvent.create("experience_started", bundle=bundle))
             if self.config.include_state_events:
-                events.append(ReplayEvent.create("state_observed", bundle=bundle))
+                self._emit(events, ReplayEvent.create("state_observed", bundle=bundle))
             if self.config.include_action_events:
-                events.append(ReplayEvent.create("action_replayed", bundle=bundle))
+                self._emit(events, ReplayEvent.create("action_replayed", bundle=bundle))
             if self.config.include_outcome_events:
-                events.append(ReplayEvent.create("outcome_observed", bundle=bundle))
-            events.append(ReplayEvent.create("experience_completed", bundle=bundle))
+                self._emit(
+                    events, ReplayEvent.create("outcome_observed", bundle=bundle)
+                )
+            self._emit(
+                events, ReplayEvent.create("experience_completed", bundle=bundle)
+            )
             self._sleep_between_experiences()
-        events.append(ReplayEvent.create("replay_completed"))
+        self._emit(events, ReplayEvent.create("replay_completed"))
         duration = time.monotonic() - started
         return ReplayResult(
             events=events,
@@ -64,3 +77,11 @@ class ReplayEngine:
             return
         delay_seconds = 1.0 / self.config.speed_multiplier
         time.sleep(delay_seconds)
+
+    def _emit(self, events: list[ReplayEvent], event: ReplayEvent) -> None:
+        events.append(event)
+        for callback in self.callbacks:
+            try:
+                callback(event)
+            except Exception as exc:  # noqa: BLE001
+                raise ReplayCallbackError("replay event callback failed") from exc
