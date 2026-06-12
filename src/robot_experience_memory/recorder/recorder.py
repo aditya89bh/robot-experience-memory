@@ -49,6 +49,7 @@ class ExperienceRecorder:
             outcome_record, "duration_seconds", duration_seconds
         )
         metadata_record = self._coerce_metadata(metadata)
+        metadata_record = self._with_status_tag(metadata_record, outcome_record.success)
         experience = ExperienceRecord(
             experience_id=experience_id or generate_experience_id(),
             state_id=state_record.state_id,
@@ -100,3 +101,8 @@ class ExperienceRecorder:
         metrics = dict(outcome.metrics)
         metrics[key] = value
         return outcome.model_copy(update={"metrics": metrics})
+
+    def _with_status_tag(self, metadata: Metadata, success: bool) -> Metadata:
+        status_tag = "success" if success else "failure"
+        tags = tuple(dict.fromkeys((*metadata.tags, status_tag)))
+        return metadata.model_copy(update={"tags": tags})
