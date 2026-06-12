@@ -24,6 +24,13 @@ from robot_experience_memory.ros2.errors import (
     OptionalDependencyError,
     ROS2IntegrationError,
 )
+from robot_experience_memory.ros2.publishers import (
+    outcome_to_payload,
+    publish_outcome,
+    publish_payload,
+    publish_recovery_suggestion,
+    recovery_suggestion_to_payload,
+)
 
 __all__ = [
     "OptionalDependencyError",
@@ -35,6 +42,11 @@ __all__ = [
     "import_rclpy",
     "is_rclpy_available",
     "metadata_from_execution_event",
+    "outcome_to_payload",
+    "publish_outcome",
+    "publish_payload",
+    "publish_recovery_suggestion",
+    "recovery_suggestion_to_payload",
     "outcome_from_execution_event",
     "require_rclpy",
     "state_from_execution_event",
