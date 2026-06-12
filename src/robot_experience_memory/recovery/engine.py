@@ -12,10 +12,13 @@ RecoveryResult = RecoverySuggestion
 class RecoveryEngine:
     """Analyze stored experiences and suggest deterministic recovery actions."""
 
-    def __init__(self, store: MemoryStore) -> None:
+    def __init__(self, store: MemoryStore, *, max_retries: int = 1) -> None:
         self.store = store
+        self.max_retries = max_retries
 
-    def suggest_recovery(self, failed_experience: ExperienceBundle) -> RecoveryResult:
+    def suggest_recovery(
+        self, failed_experience: ExperienceBundle, *, retry_count: int = 0
+    ) -> RecoveryResult:
         """Suggest a recovery action for a failed experience bundle."""
         experiences = self.store.list()
         similar_failures = [
@@ -26,9 +29,19 @@ class RecoveryEngine:
             and bundle.metadata.robot_id == failed_experience.metadata.robot_id
         ]
         suggestion_type: SuggestionType
-        if len(similar_failures) <= 1:
+        related_successes = [
+            bundle
+            for bundle in experiences
+            if bundle.outcome.success
+            and bundle.action.action_type == failed_experience.action.action_type
+            and bundle.metadata.robot_id == failed_experience.metadata.robot_id
+        ]
+        if retry_count >= self.max_retries:
+            suggestion_type = "escalate"
+            rationale = "retry budget is exhausted"
+        elif len(similar_failures) <= self.max_retries or related_successes:
             suggestion_type = "retry"
-            rationale = "failure is rare for this robot/action pair"
+            rationale = "failure is rare or this action has succeeded before"
         else:
             suggestion_type = "escalate"
             rationale = "similar failures have repeated for this robot/action pair"
