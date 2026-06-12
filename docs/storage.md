@@ -61,3 +61,15 @@ from robot_experience_memory.store import StoreConfig, create_memory_store
 
 store = create_memory_store(StoreConfig(backend="sqlite", path="memory.sqlite3"))
 ```
+
+## Benchmarks
+
+A lightweight deterministic benchmark is available:
+
+```bash
+python benchmarks/benchmark_backends.py
+```
+
+It writes, reads, and lists a small fixed set of bundles for the in-memory,
+SQLite, and JSONL backends, then prints a JSON summary. It is intended for quick
+local comparisons rather than rigorous performance analysis.
