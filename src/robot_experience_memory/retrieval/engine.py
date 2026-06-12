@@ -6,6 +6,7 @@ from robot_experience_memory.retrieval.query import (
     RetrievalQuery,
     RetrievalResult,
 )
+from robot_experience_memory.retrieval.scoring import exact_match_score
 from robot_experience_memory.store import MemoryStore
 
 
@@ -18,7 +19,7 @@ class RetrievalEngine(RetrievalInterface):
     def retrieve(self, query: RetrievalQuery) -> RetrievalResult:
         """Return stored experiences for a query."""
         matches = tuple(
-            RetrievalMatch(experience=bundle, score=0.0)
+            RetrievalMatch(experience=bundle, score=exact_match_score(query, bundle))
             for bundle in self.store.list()
         )
         return RetrievalResult(query=query, matches=matches)

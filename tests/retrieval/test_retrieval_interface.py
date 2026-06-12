@@ -17,4 +17,4 @@ def test_retrieval_engine_returns_typed_result() -> None:
 
     assert isinstance(result, RetrievalResult)
     assert result.query.action_type == "navigate"
-    assert result.matches == (RetrievalMatch(experience=bundle, score=0.0),)
+    assert result.matches == (RetrievalMatch(experience=bundle, score=1.0),)
