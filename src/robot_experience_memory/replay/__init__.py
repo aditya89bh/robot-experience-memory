@@ -9,6 +9,7 @@ from robot_experience_memory.replay.errors import (
     ReplayInterrupted,
 )
 from robot_experience_memory.replay.events import ReplayEvent, ReplayEventType
+from robot_experience_memory.replay.reports import ReplayReport
 from robot_experience_memory.replay.statistics import ReplayStatistics
 
 __all__ = [
@@ -20,6 +21,7 @@ __all__ = [
     "ReplayInterrupted",
     "ReplayEventCallback",
     "ReplayEventType",
+    "ReplayReport",
     "ReplayResult",
     "ReplayStatistics",
 ]

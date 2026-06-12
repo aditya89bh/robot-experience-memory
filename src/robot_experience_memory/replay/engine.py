@@ -1,14 +1,14 @@
 """Replay engine for stored robot experience memories."""
 
 import time
-from dataclasses import dataclass
 from datetime import UTC, datetime
 
 from robot_experience_memory.replay.callbacks import ReplayEventCallback
 from robot_experience_memory.replay.config import ReplayConfig
 from robot_experience_memory.replay.errors import ReplayCallbackError, ReplayInterrupted
 from robot_experience_memory.replay.events import ReplayEvent, ReplayEventType
-from robot_experience_memory.replay.statistics import ReplayStatistics, build_statistics
+from robot_experience_memory.replay.reports import ReplayReport
+from robot_experience_memory.replay.statistics import build_statistics
 from robot_experience_memory.store import (
     ExperienceBundle,
     ExperienceFilter,
@@ -16,15 +16,7 @@ from robot_experience_memory.store import (
     Pagination,
 )
 
-
-@dataclass(frozen=True)
-class ReplayResult:
-    """Replay events plus aggregate statistics."""
-
-    events: list[ReplayEvent]
-    statistics: ReplayStatistics
-    interrupted: bool = False
-    interruption_reason: str | None = None
+ReplayResult = ReplayReport
 
 
 class ReplayEngine:
@@ -47,6 +39,7 @@ class ReplayEngine:
         pagination: Pagination | None = None,
     ) -> ReplayResult:
         """Replay selected stored bundles and return events with statistics."""
+        started_at = self._now()
         started = time.monotonic()
         replayed_bundles: list[ExperienceBundle] = []
         events: list[ReplayEvent] = []
@@ -85,13 +78,22 @@ class ReplayEngine:
             interruption_reason = str(exc)
             self._emit(events, self._create_event("replay_interrupted"))
         duration = time.monotonic() - started
-        return ReplayResult(
-            events=events,
-            statistics=build_statistics(
-                replayed_bundles, replay_duration_seconds=duration
-            ),
+        completed_at = self._now()
+        statistics = build_statistics(
+            replayed_bundles, replay_duration_seconds=duration
+        )
+        return ReplayReport(
+            started_at=started_at,
+            completed_at=completed_at,
+            duration_seconds=duration,
+            total_events=len(events),
+            total_experiences=statistics.total_experiences,
+            success_count=statistics.success_count,
+            failure_count=statistics.failure_count,
             interrupted=interrupted,
             interruption_reason=interruption_reason,
+            events=events,
+            statistics=statistics,
         )
 
     def _sleep_between_experiences(self) -> None:
@@ -120,3 +122,9 @@ class ReplayEngine:
             else None
         )
         return ReplayEvent.create(event_type, bundle=bundle, timestamp=timestamp)
+
+    def _now(self) -> datetime:
+        """Return replay clock time, stable when deterministic mode is enabled."""
+        if self.config.deterministic:
+            return datetime(1970, 1, 1, tzinfo=UTC)
+        return datetime.now(tz=UTC)
