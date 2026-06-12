@@ -8,12 +8,17 @@ from robot_experience_memory.store.errors import (
     MemoryStoreError,
     StoreConfigurationError,
 )
+from robot_experience_memory.store.filters import ExperienceFilter, Pagination
+from robot_experience_memory.store.memory import InMemoryStore
 
 __all__ = [
     "DuplicateExperienceError",
     "ExperienceBundle",
+    "ExperienceFilter",
     "ExperienceNotFoundError",
+    "InMemoryStore",
     "MemoryStore",
     "MemoryStoreError",
+    "Pagination",
     "StoreConfigurationError",
 ]
