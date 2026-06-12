@@ -33,9 +33,17 @@ class ExperienceRecorder:
         experience_id: str | None = None,
     ) -> ExperienceBundle:
         """Build, persist, and return a complete experience bundle."""
+        recorded_start = utc_now()
         state_record = self._coerce_state(state)
         action_record = self._coerce_action(action)
         outcome_record = self._coerce_outcome(outcome)
+        recorded_end = utc_now()
+        outcome_record = self._with_outcome_metric(
+            outcome_record, "recorded_start_timestamp", recorded_start.timestamp()
+        )
+        outcome_record = self._with_outcome_metric(
+            outcome_record, "recorded_end_timestamp", recorded_end.timestamp()
+        )
         metadata_record = self._coerce_metadata(metadata)
         experience = ExperienceRecord(
             experience_id=experience_id or generate_experience_id(),
@@ -50,7 +58,7 @@ class ExperienceRecorder:
             action=action_record,
             outcome=outcome_record,
             metadata=metadata_record,
-            stored_at=utc_now(),
+            stored_at=recorded_end,
         )
         return self.store.put(bundle)
 
@@ -81,3 +89,10 @@ class ExperienceRecorder:
         data = dict(metadata)
         data.setdefault("metadata_id", generate_experience_id("metadata"))
         return Metadata.model_validate(data)
+
+    def _with_outcome_metric(
+        self, outcome: OutcomeRecord, key: str, value: float
+    ) -> OutcomeRecord:
+        metrics = dict(outcome.metrics)
+        metrics[key] = value
+        return outcome.model_copy(update={"metrics": metrics})
