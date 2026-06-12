@@ -8,6 +8,7 @@ from robot_experience_memory.retrieval.query import (
 )
 from robot_experience_memory.retrieval.ranking import (
     RetrievalWeights,
+    rank_matches,
     score_bundles,
 )
 from robot_experience_memory.store import MemoryStore
@@ -33,6 +34,7 @@ class RetrievalEngine(RetrievalInterface):
             )
             for bundle in bundles
         )
+        matches = rank_matches(matches)
         if query.top_k is not None:
             matches = matches[: query.top_k]
         return RetrievalResult(query=query, matches=matches)

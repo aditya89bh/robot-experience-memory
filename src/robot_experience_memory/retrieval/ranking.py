@@ -3,7 +3,7 @@
 from pydantic import Field, model_validator
 
 from robot_experience_memory.models.base import MemoryModel
-from robot_experience_memory.retrieval.query import RetrievalQuery
+from robot_experience_memory.retrieval.query import RetrievalMatch, RetrievalQuery
 from robot_experience_memory.retrieval.scoring import (
     exact_match_score,
     metadata_similarity_score,
@@ -98,3 +98,17 @@ def score_bundles(
         )
         for bundle in bundles
     }
+
+
+def rank_matches(matches: tuple[RetrievalMatch, ...]) -> tuple[RetrievalMatch, ...]:
+    """Rank matches by score, recency, and stable experience ID."""
+    return tuple(
+        sorted(
+            matches,
+            key=lambda match: (
+                -match.score,
+                -match.experience.stored_at.timestamp(),
+                match.experience.experience.experience_id,
+            ),
+        )
+    )
