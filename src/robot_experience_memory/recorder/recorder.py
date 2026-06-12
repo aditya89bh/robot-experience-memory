@@ -44,6 +44,10 @@ class ExperienceRecorder:
         outcome_record = self._with_outcome_metric(
             outcome_record, "recorded_end_timestamp", recorded_end.timestamp()
         )
+        duration_seconds = max(0.0, (recorded_end - recorded_start).total_seconds())
+        outcome_record = self._with_outcome_metric(
+            outcome_record, "duration_seconds", duration_seconds
+        )
         metadata_record = self._coerce_metadata(metadata)
         experience = ExperienceRecord(
             experience_id=experience_id or generate_experience_id(),
