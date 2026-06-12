@@ -10,6 +10,7 @@ from robot_experience_memory.recovery.patterns import (
 from robot_experience_memory.recovery.strategies import (
     FallbackAction,
     find_fallback_action,
+    score_confidence,
 )
 from robot_experience_memory.recovery.suggestions import (
     RecoverySuggestion,
@@ -28,4 +29,5 @@ __all__ = [
     "cluster_outcomes",
     "detect_failure_patterns",
     "find_fallback_action",
+    "score_confidence",
 ]

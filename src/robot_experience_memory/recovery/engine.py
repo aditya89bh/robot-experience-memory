@@ -1,6 +1,9 @@
 """Rule-based recovery intelligence engine."""
 
-from robot_experience_memory.recovery.strategies import find_fallback_action
+from robot_experience_memory.recovery.strategies import (
+    find_fallback_action,
+    score_confidence,
+)
 from robot_experience_memory.recovery.suggestions import (
     RecoverySuggestion,
     SuggestionType,
@@ -60,10 +63,17 @@ class RecoveryEngine:
         else:
             suggestion_type = "escalate"
             rationale = "similar failures have repeated for this robot/action pair"
+        confidence = score_confidence(
+            sample_size=len(similar_failures) + len(related_successes),
+            successes=len(related_successes)
+            + (0 if fallback is None else fallback.success_count),
+            failures=len(similar_failures),
+            similarity=1.0,
+        )
         return RecoverySuggestion(
             suggestion_type=suggestion_type,
             rationale=rationale,
-            confidence=0.5,
+            confidence=confidence,
             related_experience_ids=tuple(
                 bundle.experience.experience_id for bundle in similar_failures
             )
