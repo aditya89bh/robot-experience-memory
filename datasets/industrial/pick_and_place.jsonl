@@ -1,0 +1,5 @@
+{"experience_id":"pp-001","robot_id":"arm-1","environment":"assembly-cell-b","action_type":"detect_part","success":true,"error_code":null,"tags":["pick-place","vision"],"summary":"located bracket in tray"}
+{"experience_id":"pp-002","robot_id":"arm-1","environment":"assembly-cell-b","action_type":"pick_part","success":false,"error_code":"pose_uncertainty","tags":["pick-place","pick"],"summary":"failed pick due to ambiguous part pose"}
+{"experience_id":"pp-003","robot_id":"arm-1","environment":"assembly-cell-b","action_type":"relocalize_part","success":true,"error_code":null,"tags":["pick-place","recovery","vision"],"summary":"relocalized bracket using closer camera pose"}
+{"experience_id":"pp-004","robot_id":"arm-1","environment":"assembly-cell-b","action_type":"pick_part","success":true,"error_code":null,"tags":["pick-place","pick"],"summary":"picked bracket after relocalization"}
+{"experience_id":"pp-005","robot_id":"arm-1","environment":"assembly-cell-b","action_type":"place_part","success":true,"error_code":null,"tags":["pick-place","place"],"summary":"placed bracket into fixture"}

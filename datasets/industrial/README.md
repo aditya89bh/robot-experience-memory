@@ -8,3 +8,9 @@ failure/recovery patterns.
 
 A CNC tending sequence with raw-stock loading, chuck confirmation, a coolant-induced
 unload slip, a wipe recovery action, and successful unload retry.
+
+
+## `pick_and_place.jsonl`
+
+A pick-and-place sequence with vision localization, pose-uncertainty failure,
+relocalization recovery, successful pick retry, and final placement.
