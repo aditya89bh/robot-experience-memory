@@ -158,3 +158,11 @@ for match in result.matches:
 See [docs/retrieval.md](docs/retrieval.md) for scoring, ranking, explanations,
 caching, benchmarks, and CLI usage.
 
+
+
+## Phase 8 production hardening
+
+Version 0.2.0 adds scalability and industrial-validation work: query planning,
+SQLite pushdown, lazy retrieval loading, corruption/concurrency tests, temporal
+recovery chains, causal fallback evidence, sequence scoring, industrial datasets,
+evaluation metrics, and an end-to-end validation demo.
