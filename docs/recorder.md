@@ -106,3 +106,14 @@ def plan() -> str:
 
 Successful returns record success. Raised exceptions record failure and are
 re-raised by default.
+
+## Recorder Benchmark
+
+A lightweight recorder benchmark is available:
+
+```bash
+python benchmarks/benchmark_recorder.py
+```
+
+It uses `InMemoryStore` and compares manual recording, context manager capture,
+and decorator capture. Results are printed as JSON.
