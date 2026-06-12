@@ -67,6 +67,29 @@ class ExperienceRecorder:
         )
         return self.store.put(bundle)
 
+    def capture_exception(
+        self,
+        exception: BaseException,
+        *,
+        state: StateSnapshot | ModelInput,
+        action: ActionRecord | ModelInput,
+        metadata: Metadata | ModelInput,
+        experience_id: str | None = None,
+    ) -> ExperienceBundle:
+        """Record an exception as a failed robot experience."""
+        exception_type = type(exception).__name__
+        return self.record(
+            state=state,
+            action=action,
+            outcome={
+                "success": False,
+                "summary": f"{exception_type}: {exception}",
+                "error_code": f"exception.{exception_type}",
+            },
+            metadata=metadata,
+            experience_id=experience_id,
+        )
+
     def _coerce_state(self, state: StateSnapshot | ModelInput) -> StateSnapshot:
         if isinstance(state, StateSnapshot):
             return state
