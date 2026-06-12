@@ -64,3 +64,21 @@ robot_memories = store.query_by_robot_id("robot-a")
 ```
 
 See `docs/storage.md` for the full storage backend guide.
+
+## Recorder Example
+
+```python
+from robot_experience_memory.recorder import ExperienceRecorder
+from robot_experience_memory.store import InMemoryStore
+
+recorder = ExperienceRecorder(InMemoryStore(), default_environment="lab")
+bundle = recorder.record(
+    state={"battery_level": 90.0},
+    action={"action_type": "navigate", "command": "move_to"},
+    outcome={"success": True, "summary": "arrived"},
+    metadata={"robot_id": "robot-a"},
+)
+```
+
+See `docs/recorder.md` for manual, context manager, decorator, exception, hook,
+and sensor-reference capture patterns.
