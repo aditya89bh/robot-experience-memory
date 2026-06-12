@@ -1,5 +1,6 @@
 """Replay engine for stored robot experience memories."""
 
+from robot_experience_memory.replay.config import ReplayConfig
 from robot_experience_memory.replay.events import ReplayEvent
 from robot_experience_memory.store import MemoryStore
 
@@ -7,8 +8,9 @@ from robot_experience_memory.store import MemoryStore
 class ReplayEngine:
     """Replay stored experience bundles as structured events."""
 
-    def __init__(self, store: MemoryStore) -> None:
+    def __init__(self, store: MemoryStore, config: ReplayConfig | None = None) -> None:
         self.store = store
+        self.config = config or ReplayConfig()
 
     def replay(self) -> list[ReplayEvent]:
         """Replay all stored bundles and return structured replay events."""
