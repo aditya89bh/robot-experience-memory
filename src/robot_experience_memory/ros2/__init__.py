@@ -33,6 +33,11 @@ from robot_experience_memory.ros2.publishers import (
     recovery_suggestion_to_payload,
     replay_event_to_payload,
 )
+from robot_experience_memory.ros2.rosbag import (
+    RosbagReference,
+    rosbag_sensor_reference,
+    rosbag_uri,
+)
 
 __all__ = [
     "OptionalDependencyError",
@@ -41,6 +46,7 @@ __all__ = [
     "capture_action_execution",
     "ROS2ActionCapture",
     "ROS2IntegrationError",
+    "RosbagReference",
     "import_rclpy",
     "is_rclpy_available",
     "metadata_from_execution_event",
@@ -51,6 +57,8 @@ __all__ = [
     "publish_replay_event",
     "recovery_suggestion_to_payload",
     "replay_event_to_payload",
+    "rosbag_sensor_reference",
+    "rosbag_uri",
     "outcome_from_execution_event",
     "require_rclpy",
     "state_from_execution_event",
