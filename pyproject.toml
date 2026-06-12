@@ -51,3 +51,6 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 python_version = "3.11"
 strict = true
 packages = ["robot_experience_memory"]
+
+[project.scripts]
+robot-experience-replay = "robot_experience_memory.replay.cli:main"
