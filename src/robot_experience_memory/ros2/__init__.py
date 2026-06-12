@@ -29,7 +29,9 @@ from robot_experience_memory.ros2.publishers import (
     publish_outcome,
     publish_payload,
     publish_recovery_suggestion,
+    publish_replay_event,
     recovery_suggestion_to_payload,
+    replay_event_to_payload,
 )
 
 __all__ = [
@@ -46,7 +48,9 @@ __all__ = [
     "publish_outcome",
     "publish_payload",
     "publish_recovery_suggestion",
+    "publish_replay_event",
     "recovery_suggestion_to_payload",
+    "replay_event_to_payload",
     "outcome_from_execution_event",
     "require_rclpy",
     "state_from_execution_event",

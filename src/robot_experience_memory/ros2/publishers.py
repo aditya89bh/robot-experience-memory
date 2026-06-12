@@ -8,6 +8,7 @@ from typing import Any, Protocol
 
 from robot_experience_memory.models import OutcomeRecord
 from robot_experience_memory.recovery import RecoverySuggestion
+from robot_experience_memory.replay import ReplayEvent
 
 
 class PublisherLike(Protocol):
@@ -84,5 +85,24 @@ def publish_recovery_suggestion(
     return publish_payload(
         publisher,
         recovery_suggestion_to_payload(suggestion),
+        message_factory=message_factory,
+    )
+
+
+def replay_event_to_payload(event: ReplayEvent) -> dict[str, Any]:
+    """Return a JSON-safe payload for a ReplayEvent."""
+    return event.to_visualization_dict()
+
+
+def publish_replay_event(
+    publisher: PublisherLike,
+    event: ReplayEvent,
+    *,
+    message_factory: MessageFactory | None = None,
+) -> object:
+    """Publish a ReplayEvent as JSON or a caller-provided message object."""
+    return publish_payload(
+        publisher,
+        replay_event_to_payload(event),
         message_factory=message_factory,
     )
