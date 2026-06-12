@@ -2,6 +2,7 @@
 
 from robot_experience_memory.store.base import MemoryStore
 from robot_experience_memory.store.bundle import ExperienceBundle
+from robot_experience_memory.store.config import StoreConfig, create_memory_store
 from robot_experience_memory.store.errors import (
     DuplicateExperienceError,
     ExperienceNotFoundError,
@@ -24,5 +25,7 @@ __all__ = [
     "MemoryStoreError",
     "Pagination",
     "SQLiteMemoryStore",
+    "StoreConfig",
     "StoreConfigurationError",
+    "create_memory_store",
 ]
