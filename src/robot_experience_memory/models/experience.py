@@ -1,12 +1,13 @@
 """Experience record model."""
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from robot_experience_memory.models.base import MemoryModel
 
 
-class ExperienceRecord(BaseModel):
+class ExperienceRecord(MemoryModel):
     """A robot experience linking state, action, outcome, and metadata records."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
 
     experience_id: str = Field(min_length=1)
     state_id: str = Field(min_length=1)

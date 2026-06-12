@@ -2,13 +2,14 @@
 
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
+
+from robot_experience_memory.models.base import MemoryModel
 
 
-class ActionRecord(BaseModel):
+class ActionRecord(MemoryModel):
     """Action executed by the robot."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
 
     action_id: str = Field(min_length=1)
     action_type: str = Field(min_length=1)

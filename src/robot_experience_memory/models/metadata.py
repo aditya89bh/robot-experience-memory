@@ -1,12 +1,13 @@
 """Context metadata model."""
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
+
+from robot_experience_memory.models.base import MemoryModel
 
 
-class Metadata(BaseModel):
+class Metadata(MemoryModel):
     """Contextual information associated with a robot experience."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
 
     metadata_id: str = Field(min_length=1)
     robot_id: str = Field(min_length=1)

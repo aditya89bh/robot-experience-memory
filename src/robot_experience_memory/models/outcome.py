@@ -1,12 +1,13 @@
 """Outcome record model."""
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
+
+from robot_experience_memory.models.base import MemoryModel
 
 
-class OutcomeRecord(BaseModel):
+class OutcomeRecord(MemoryModel):
     """Execution result produced after a robot action."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
 
     outcome_id: str = Field(min_length=1)
     success: bool

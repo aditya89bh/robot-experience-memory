@@ -2,13 +2,14 @@
 
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
+
+from robot_experience_memory.models.base import MemoryModel
 
 
-class StateSnapshot(BaseModel):
+class StateSnapshot(MemoryModel):
     """Robot state captured before action execution."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
 
     state_id: str = Field(min_length=1)
     joint_positions: dict[str, float] = Field(default_factory=dict)
