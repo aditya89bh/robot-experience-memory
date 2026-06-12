@@ -35,7 +35,7 @@ def cluster_outcomes(experiences: Iterable[ExperienceBundle]) -> list[OutcomeClu
             action_type=action_type,
             environment=environment,
             count=len(ids),
-            experience_ids=tuple(ids),
+            experience_ids=tuple(sorted(ids)),
         )
         for (success, error_code, action_type, environment), ids in buckets.items()
     ]
