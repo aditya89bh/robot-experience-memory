@@ -16,6 +16,10 @@ from robot_experience_memory.ros2.availability import (
     is_rclpy_available,
     require_rclpy,
 )
+from robot_experience_memory.ros2.capture import (
+    ROS2ActionCapture,
+    capture_action_execution,
+)
 from robot_experience_memory.ros2.errors import (
     OptionalDependencyError,
     ROS2IntegrationError,
@@ -25,6 +29,8 @@ __all__ = [
     "OptionalDependencyError",
     "action_from_execution_event",
     "bundle_from_execution_event",
+    "capture_action_execution",
+    "ROS2ActionCapture",
     "ROS2IntegrationError",
     "import_rclpy",
     "is_rclpy_available",
