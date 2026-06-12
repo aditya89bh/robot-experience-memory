@@ -110,3 +110,24 @@ print(suggestion.suggestion_type, suggestion.confidence)
 
 See [docs/recovery.md](docs/recovery.md) for policies, traces, examples, and evaluation notes.
 
+## Similar Experience Retrieval
+
+Phase 6 adds deterministic similar-experience retrieval over any `MemoryStore`.
+It uses exact fields, metadata, tag overlap, outcome matching, temporal recency,
+weights, top-k ranking, explanations, and optional in-memory caching — without
+embeddings, LLMs, or heavy dependencies.
+
+```python
+from robot_experience_memory.retrieval import RetrievalEngine, RetrievalQuery
+
+engine = RetrievalEngine(store)
+result = engine.retrieve(
+    RetrievalQuery(action_type="navigate", robot_id="robot-a", top_k=3)
+)
+for match in result.matches:
+    print(match.experience.experience.experience_id, match.score)
+```
+
+See [docs/retrieval.md](docs/retrieval.md) for scoring, ranking, explanations,
+caching, benchmarks, and CLI usage.
+
