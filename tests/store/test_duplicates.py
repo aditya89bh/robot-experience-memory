@@ -13,13 +13,14 @@ def test_store_rejects_duplicate_experience_ids_by_default() -> None:
         store.put(bundle)
 
 
-def test_store_allows_explicit_overwrite_without_reordering() -> None:
+def test_store_rejects_duplicate_even_when_overwrite_requested() -> None:
     store = InMemoryStore()
     first = make_bundle("exp-1", success=False)
     second = make_bundle("exp-1", success=True)
 
     store.put(first)
-    store.put(second, allow_overwrite=True)
 
-    assert store.get("exp-1") == second
-    assert store.list() == [second]
+    with pytest.raises(DuplicateExperienceError, match="exp-1"):
+        store.put(second, allow_overwrite=True)
+
+    assert store.get("exp-1") == first

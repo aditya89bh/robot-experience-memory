@@ -21,10 +21,10 @@ class InMemoryStore(MemoryStore):
     ) -> ExperienceBundle:
         """Persist one bundle, rejecting duplicate experience IDs."""
         experience_id = bundle.experience_id
-        if experience_id in self._bundles and not allow_overwrite:
+        _ = allow_overwrite
+        if experience_id in self._bundles:
             raise DuplicateExperienceError(experience_id)
-        if experience_id not in self._bundles:
-            self._order.append(experience_id)
+        self._order.append(experience_id)
         self._bundles[experience_id] = bundle
         return bundle
 

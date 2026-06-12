@@ -26,7 +26,8 @@ class JSONLMemoryStore(MemoryStore):
         allow_overwrite: bool = False,
     ) -> ExperienceBundle:
         """Append one bundle to the JSONL file."""
-        if self.get(bundle.experience_id) is not None and not allow_overwrite:
+        _ = allow_overwrite
+        if self.get(bundle.experience_id) is not None:
             raise DuplicateExperienceError(bundle.experience_id)
         with self.path.open("a", encoding="utf-8") as file:
             file.write(bundle.to_json().replace("\n", "") + "\n")

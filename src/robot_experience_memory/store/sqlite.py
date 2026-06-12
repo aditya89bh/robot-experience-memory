@@ -98,17 +98,17 @@ class SQLiteMemoryStore(MemoryStore):
         *,
         allow_overwrite: bool,
     ) -> None:
-        mode = "INSERT OR REPLACE" if allow_overwrite else "INSERT"
+        _ = allow_overwrite
         connection.execute(
-            f"""
-            {mode} INTO states (state_id, payload_json)
+            """
+            INSERT INTO states (state_id, payload_json)
             VALUES (?, ?)
             """,
             (bundle.state.state_id, bundle.state.to_json()),
         )
         connection.execute(
-            f"""
-            {mode} INTO actions (action_id, action_type, payload_json)
+            """
+            INSERT INTO actions (action_id, action_type, payload_json)
             VALUES (?, ?, ?)
             """,
             (
@@ -118,8 +118,8 @@ class SQLiteMemoryStore(MemoryStore):
             ),
         )
         connection.execute(
-            f"""
-            {mode} INTO outcomes (outcome_id, success, payload_json)
+            """
+            INSERT INTO outcomes (outcome_id, success, payload_json)
             VALUES (?, ?, ?)
             """,
             (
@@ -129,8 +129,8 @@ class SQLiteMemoryStore(MemoryStore):
             ),
         )
         connection.execute(
-            f"""
-            {mode} INTO metadata_records (
+            """
+            INSERT INTO metadata_records (
                 metadata_id,
                 robot_id,
                 operator,
@@ -150,8 +150,8 @@ class SQLiteMemoryStore(MemoryStore):
             ),
         )
         connection.execute(
-            f"""
-            {mode} INTO experiences (
+            """
+            INSERT INTO experiences (
                 experience_id,
                 state_id,
                 action_id,

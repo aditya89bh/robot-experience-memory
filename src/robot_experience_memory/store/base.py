@@ -9,9 +9,9 @@ from robot_experience_memory.store.filters import ExperienceFilter, Pagination
 class MemoryStore(ABC):
     """Abstract API for persisting complete robot experience bundles.
 
-    Stores are append-oriented by default: inserting an existing experience ID
-    should fail unless a backend explicitly receives an overwrite instruction in
-    a later API extension.
+    Stores are append-only: inserting an existing experience ID must raise
+    ``DuplicateExperienceError``. The ``allow_overwrite`` parameter is kept for
+    backwards-compatible callers but backends should not overwrite records.
     """
 
     @abstractmethod
@@ -33,7 +33,11 @@ class MemoryStore(ABC):
         *,
         allow_overwrite: bool = False,
     ) -> list[ExperienceBundle]:
-        """Persist multiple complete experience bundles in input order."""
+        """Persist multiple complete experience bundles in input order.
+
+        ``allow_overwrite`` is accepted for compatibility and does not permit
+        duplicate IDs in append-only stores.
+        """
         return [self.put(bundle, allow_overwrite=allow_overwrite) for bundle in bundles]
 
     def get_many(self, experience_ids: list[str]) -> list[ExperienceBundle | None]:

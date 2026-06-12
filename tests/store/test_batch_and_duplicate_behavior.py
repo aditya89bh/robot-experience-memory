@@ -12,11 +12,12 @@ def test_put_many_rejects_duplicate_ids() -> None:
         store.put_many([bundle, bundle])
 
 
-def test_put_many_allows_explicit_overwrite() -> None:
+def test_put_many_rejects_duplicate_ids_even_when_overwrite_requested() -> None:
     store = InMemoryStore()
     first = make_bundle("exp-1", success=False)
     second = make_bundle("exp-1", success=True)
 
-    store.put_many([first, second], allow_overwrite=True)
+    with pytest.raises(DuplicateExperienceError):
+        store.put_many([first, second], allow_overwrite=True)
 
-    assert store.list() == [second]
+    assert store.list() == [first]
