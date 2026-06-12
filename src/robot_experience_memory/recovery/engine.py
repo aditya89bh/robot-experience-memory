@@ -1,5 +1,6 @@
 """Rule-based recovery intelligence engine."""
 
+from robot_experience_memory.recovery.policies import RecoveryPolicy
 from robot_experience_memory.recovery.strategies import (
     find_fallback_action,
     score_confidence,
@@ -20,12 +21,24 @@ class RecoveryEngine:
         self,
         store: MemoryStore,
         *,
-        max_retries: int = 1,
-        escalation_threshold: int = 3,
+        policy: RecoveryPolicy | None = None,
+        max_retries: int | None = None,
+        escalation_threshold: int | None = None,
     ) -> None:
         self.store = store
-        self.max_retries = max_retries
-        self.escalation_threshold = escalation_threshold
+        base_policy = policy or RecoveryPolicy()
+        self.policy = base_policy.model_copy(
+            update={
+                key: value
+                for key, value in {
+                    "max_retries": max_retries,
+                    "escalation_threshold": escalation_threshold,
+                }.items()
+                if value is not None
+            }
+        )
+        self.max_retries = self.policy.max_retries
+        self.escalation_threshold = self.policy.escalation_threshold
 
     def suggest_recovery(
         self, failed_experience: ExperienceBundle, *, retry_count: int = 0
@@ -70,6 +83,9 @@ class RecoveryEngine:
             failures=len(similar_failures),
             similarity=1.0,
         )
+        if confidence < self.policy.minimum_confidence:
+            suggestion_type = "escalate"
+            rationale = "confidence is below recovery policy threshold"
         return RecoverySuggestion(
             suggestion_type=suggestion_type,
             rationale=rationale,
