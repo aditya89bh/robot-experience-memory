@@ -8,7 +8,7 @@ from robot_experience_memory.retrieval.query import (
 )
 from robot_experience_memory.retrieval.ranking import (
     RetrievalWeights,
-    weighted_similarity_score,
+    score_bundles,
 )
 from robot_experience_memory.store import MemoryStore
 
@@ -24,11 +24,13 @@ class RetrievalEngine(RetrievalInterface):
 
     def retrieve(self, query: RetrievalQuery) -> RetrievalResult:
         """Return stored experiences for a query."""
+        bundles = self.store.list()
+        scores = score_bundles(query, bundles, self.weights)
         matches = tuple(
             RetrievalMatch(
                 experience=bundle,
-                score=weighted_similarity_score(query, bundle, self.weights),
+                score=scores[bundle.experience.experience_id],
             )
-            for bundle in self.store.list()
+            for bundle in bundles
         )
         return RetrievalResult(query=query, matches=matches)

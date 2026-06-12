@@ -8,6 +8,7 @@ from robot_experience_memory.retrieval.scoring import (
     exact_match_score,
     metadata_similarity_score,
     tag_similarity_score,
+    temporal_recency_scores,
 )
 from robot_experience_memory.store import ExperienceBundle
 
@@ -53,6 +54,8 @@ def weighted_similarity_score(
     query: RetrievalQuery,
     bundle: ExperienceBundle,
     weights: RetrievalWeights,
+    *,
+    temporal_score: float = 0.0,
 ) -> float:
     """Compute a deterministic weighted similarity score."""
     action_score = (
@@ -74,5 +77,24 @@ def weighted_similarity_score(
         + (weights.metadata * metadata_similarity_score(query, bundle))
         + (weights.tags * tag_similarity_score(query, bundle))
         + (weights.outcome * outcome_score)
+        + (weights.temporal * temporal_score)
     ) / active_total
     return round(max(0.0, min(1.0, score)), 6)
+
+
+def score_bundles(
+    query: RetrievalQuery,
+    bundles: list[ExperienceBundle],
+    weights: RetrievalWeights,
+) -> dict[str, float]:
+    """Score bundles with optional temporal recency support."""
+    temporal_scores = temporal_recency_scores(bundles)
+    return {
+        bundle.experience.experience_id: weighted_similarity_score(
+            query,
+            bundle,
+            weights,
+            temporal_score=temporal_scores.get(bundle.experience.experience_id, 0.0),
+        )
+        for bundle in bundles
+    }

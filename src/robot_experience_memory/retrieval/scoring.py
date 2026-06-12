@@ -45,3 +45,20 @@ def tag_similarity_score(query: RetrievalQuery, bundle: ExperienceBundle) -> flo
     if not query_tags or not bundle_tags:
         return 0.0
     return len(query_tags & bundle_tags) / len(query_tags | bundle_tags)
+
+
+def temporal_recency_scores(bundles: list[ExperienceBundle]) -> dict[str, float]:
+    """Return deterministic recency scores for bundles using stored_at order."""
+    if not bundles:
+        return {}
+    sorted_bundles = sorted(
+        bundles,
+        key=lambda bundle: (bundle.stored_at, bundle.experience.experience_id),
+    )
+    if len(sorted_bundles) == 1:
+        return {sorted_bundles[0].experience.experience_id: 1.0}
+    denominator = len(sorted_bundles) - 1
+    return {
+        bundle.experience.experience_id: index / denominator
+        for index, bundle in enumerate(sorted_bundles)
+    }

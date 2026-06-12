@@ -10,12 +10,14 @@ from robot_experience_memory.retrieval.query import (
 )
 from robot_experience_memory.retrieval.ranking import (
     RetrievalWeights,
+    score_bundles,
     weighted_similarity_score,
 )
 from robot_experience_memory.retrieval.scoring import (
     exact_match_score,
     metadata_similarity_score,
     tag_similarity_score,
+    temporal_recency_scores,
 )
 
 __all__ = [
@@ -29,5 +31,7 @@ __all__ = [
     "exact_match_score",
     "metadata_similarity_score",
     "tag_similarity_score",
+    "temporal_recency_scores",
+    "score_bundles",
     "weighted_similarity_score",
 ]
