@@ -8,6 +8,10 @@ from robot_experience_memory.retrieval.explanations import (
     explain_match,
 )
 from robot_experience_memory.retrieval.interface import RetrievalInterface
+from robot_experience_memory.retrieval.planner import (
+    RetrievalQueryPlan,
+    plan_retrieval_query,
+)
 from robot_experience_memory.retrieval.query import (
     RetrievalMatch,
     RetrievalQuery,
@@ -32,6 +36,8 @@ __all__ = [
     "RetrievalError",
     "RetrievalExplanation",
     "RetrievalInterface",
+    "RetrievalQueryPlan",
+    "plan_retrieval_query",
     "RetrievalMatch",
     "RetrievalQuery",
     "RetrievalResult",
