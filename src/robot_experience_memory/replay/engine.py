@@ -1,5 +1,7 @@
 """Replay engine for stored robot experience memories."""
 
+import time
+
 from robot_experience_memory.replay.config import ReplayConfig
 from robot_experience_memory.replay.events import ReplayEvent
 from robot_experience_memory.store import MemoryStore
@@ -24,5 +26,12 @@ class ReplayEngine:
             if self.config.include_outcome_events:
                 events.append(ReplayEvent.create("outcome_observed", bundle=bundle))
             events.append(ReplayEvent.create("experience_completed", bundle=bundle))
+            self._sleep_between_experiences()
         events.append(ReplayEvent.create("replay_completed"))
         return events
+
+    def _sleep_between_experiences(self) -> None:
+        if self.config.deterministic or self.config.speed_multiplier == 0.0:
+            return
+        delay_seconds = 1.0 / self.config.speed_multiplier
+        time.sleep(delay_seconds)
