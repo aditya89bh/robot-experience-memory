@@ -24,6 +24,12 @@ from robot_experience_memory.ros2.errors import (
     OptionalDependencyError,
     ROS2IntegrationError,
 )
+from robot_experience_memory.ros2.lifecycle import (
+    LifecycleNodeAdapter,
+    LifecycleState,
+    lifecycle_state_from_node,
+    require_lifecycle_support,
+)
 from robot_experience_memory.ros2.publishers import (
     outcome_to_payload,
     publish_outcome,
@@ -40,6 +46,8 @@ from robot_experience_memory.ros2.rosbag import (
 )
 
 __all__ = [
+    "LifecycleNodeAdapter",
+    "LifecycleState",
     "OptionalDependencyError",
     "action_from_execution_event",
     "bundle_from_execution_event",
@@ -56,9 +64,11 @@ __all__ = [
     "publish_recovery_suggestion",
     "publish_replay_event",
     "recovery_suggestion_to_payload",
+    "lifecycle_state_from_node",
     "replay_event_to_payload",
     "rosbag_sensor_reference",
     "rosbag_uri",
+    "require_lifecycle_support",
     "outcome_from_execution_event",
     "require_rclpy",
     "state_from_execution_event",
